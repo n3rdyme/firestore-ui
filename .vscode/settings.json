@@ -1,0 +1,85 @@
+{
+  "terminal.integrated.env.linux": {
+    "NPM_TOKEN": ""
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  // Disable format-on-save for these types, since we will be using prettier
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  // "eslint.autoFixOnSave": true, // has been deprecated, use editor.codeActionsOnSave instead
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
+  "editor.trimAutoWhitespace": false,
+  "js-index.quotes": "double",
+  "js-index.defaultTemplate": "export * from ${relpath};",
+  "files.exclude": {
+    ".nyc_output/": true,
+    "coverage/": true
+  },
+  "search.exclude": {
+    ".templates/": true,
+    "lib/": true,
+    "build/": true,
+    ".nyc_output/": true,
+    "coverage/": true,
+    "package-lock.json": true,
+    "npm-shrinkwrap.json": true,
+    "yarn.json": true
+  },
+  // An optional set of changes tracking options
+  "psi-header.changes-tracking": {
+    "isActive": true,
+    "include": [
+      "typescript",
+      "javascript",
+      "typescriptreact",
+      "javascriptreact"
+    ],
+    "autoHeader": "manualSave",
+    "replace": [
+      "/*",
+      " * ",
+      " */"
+    ]
+  },
+  // An optional set of global configuration options.
+  "psi-header.config": {
+    "forceToTop": true
+  },
+  // An optional set of language-specific syntax settings.
+  "psi-header.lang-config": [],
+  // Custom license text used where psi-header.config.license = Custom
+  "psi-header.license-text": [],
+  // An optional set of language-specific templates
+  "psi-header.templates": [
+    {
+      "language": "*",
+      "template": [
+        "****************************************************************************",
+        "Copyright (C) <<createdYear>>-<<year>> - All rights reserved.",
+        "Project: <<projectname>>",
+        "Created On: <<filecreated('MMMM Do, YYYY')>>",
+        "****************************************************************************"
+      ]
+    }
+  ],
+  // An array of key value pairs that define the template variables.
+  "psi-header.variables": [
+    [
+      "createdYear",
+      "2022"
+    ]
+  ]
+}

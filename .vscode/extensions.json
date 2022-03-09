@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "psioniq.psi-header",
+    "joostlubach.js-index",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ckolkman.vscode-postgres"
+  ]
+}

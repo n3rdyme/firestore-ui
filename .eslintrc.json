@@ -1,0 +1,80 @@
+{
+  "root": true,
+  "env": {
+    "browser": true
+  },
+  "extends": [
+    "airbnb",
+    "eslint:recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "react-app",
+    "react-app/jest"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "ignorePatterns": [
+    // Ignore built files.
+    "**/build/**/*",
+    "**/lib/**/*"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "import",
+    "prettier"
+  ],
+  "rules": {
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "no-shadow": "off",
+    "import/extensions": 0,
+    "import/no-unresolved": 0,
+    "import/prefer-default-export": 0,
+    "require-jsdoc": 0,
+    "new-cap": 0,
+    "no-console": 0,
+    "class-methods-use-this": 0,
+    "react/require-default-props": 0,
+    "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+    "@typescript-eslint/no-implicit-any-catch": "error",
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/jsx-filename-extension": [
+      2,
+      {
+        "extensions": [
+          ".jsx",
+          ".tsx"
+        ]
+      }
+    ],
+    "jsx-a11y/no-static-element-interactions": 0,
+    "jsx-a11y/click-events-have-key-events": 0
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/services/api/types/*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-empty-interface": "off",
+        "no-use-before-define": "off"
+      }
+    }
+  ]
+}
