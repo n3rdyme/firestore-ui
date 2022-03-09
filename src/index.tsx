@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import "./styles/output.css";
+
 import { AppLoader } from "./application/AppLoader";
 import reportWebVitals from "./reportWebVitals";
 

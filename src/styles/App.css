@@ -28,3 +28,7 @@ body {
 .card {
   @apply rounded-lg shadow-lg bg-light p-4;
 }
+
+label {
+  @apply my-2;
+}

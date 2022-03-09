@@ -11,9 +11,10 @@ import {
   AuthProvider,
   EmailAuthProvider,
   GoogleAuthProvider,
-  GithubAuthProvider,
   User,
   signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import React, {
   HTMLProps,
@@ -62,7 +63,7 @@ export function FirebaseAppAuth({
   });
 
   const login = useCallback<FirestoreAuthController["login"]>(
-    (provider) => {
+    (provider, options) => {
       if (!auth) {
         return Promise.reject(new Error("No database connected."));
       }
@@ -70,10 +71,35 @@ export function FirebaseAppAuth({
       let authProvider: AuthProvider;
       if (provider === "google") {
         authProvider = new GoogleAuthProvider();
-      } else if (provider === "github") {
-        authProvider = new GithubAuthProvider();
       } else if (provider === "email") {
         authProvider = new EmailAuthProvider();
+        return signInWithEmailAndPassword(
+          auth,
+          options?.email ?? "",
+          options?.password ?? ""
+        )
+          .then(() => {
+            /* noop */
+          })
+          .catch((ex) => {
+            if (ex.code === "auth/user-not-found") {
+              return createUserWithEmailAndPassword(
+                auth,
+                options?.email ?? "",
+                options?.password ?? ""
+              )
+                .then(() => {
+                  /* noop */
+                })
+                .catch((ex2) => {
+                  console.error(ex2);
+                  throw ex2;
+                });
+            }
+
+            console.error(ex);
+            throw ex;
+          });
       } else {
         return Promise.reject(new Error(`Unknown provider: ${provider}`));
       }
@@ -99,28 +125,6 @@ export function FirebaseAppAuth({
       console.error(ex);
     });
   }, [auth]);
-
-  // if (!loaded) {
-  //   return <Spinner />;
-  // }
-
-  // if (!fbUser || fbUser.isAnonymous) {
-  //   return (
-  //     <div className="flex flex-col flex-grow">
-  //       <div className="flex-grow" />
-  //       <div className="flex flex-col items-center">
-  //         <button
-  //           type="button"
-  //           onClick={loginClick}
-  //           className="flex flex-row items-center bg-light h-10 p-2 font-bold"
-  //         >
-  //           <FcGoogle size="2em" />
-  //           Login With Google
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   const authContext = useMemo(
     () => ({ user: fbUser, login, logout }),

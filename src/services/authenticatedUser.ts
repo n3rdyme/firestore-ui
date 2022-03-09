@@ -23,7 +23,10 @@ export interface AuthenticatedUser {
 
 export interface FirestoreAuthController {
   user: AuthenticatedUser | null;
-  login(provider: "email" | "google" | "github"): Promise<void>;
+  login(
+    provider: "email" | "google",
+    options?: { email: string; password: string }
+  ): Promise<void>;
   logout(): Promise<void>;
 }
 
