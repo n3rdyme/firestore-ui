@@ -6,15 +6,18 @@
  * ****************************************************************************
  */
 
-import { Route, Routes } from "react-router-dom";
 import React from "react";
+import { Route, Routes } from "react-router-dom";
 import { PageNotFound } from "../../components/pageNotFound";
 import { ConnectStart } from "./start";
+import { ConnectDatabase } from "./database";
 
 export function ConnectIndex() {
   return (
     <Routes>
       <Route path="" element={<ConnectStart />} />
+      <Route path=":config" element={<ConnectDatabase />} />
+      <Route path=":config/*" element={<ConnectDatabase />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

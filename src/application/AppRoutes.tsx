@@ -17,7 +17,7 @@ export function AppRoutes() {
       <Route path="/">
         <Route path="" element={<HomeIndex />} />
         <Route path="connect" element={<ConnectIndex />} />
-        <Route path="connect/**" element={<ConnectIndex />} />
+        <Route path="connect/*" element={<ConnectIndex />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

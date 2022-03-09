@@ -21,8 +21,16 @@ export interface AuthenticatedUser {
   getIdToken(forceRefresh?: boolean): Promise<string>;
 }
 
-export const AuthenticatedUserContext =
-  React.createContext<AuthenticatedUser | null>(null);
+export interface FirestoreAuthController {
+  user: AuthenticatedUser | null;
+  login(provider: "email" | "google" | "github"): Promise<void>;
+  logout(): Promise<void>;
+}
+
+export const FirestoreAuthContext =
+  React.createContext<FirestoreAuthController | null>(null);
+
+export const useFirestoreAuth = () => React.useContext(FirestoreAuthContext);
 
 export const useAuthenticatedUser = () =>
-  React.useContext(AuthenticatedUserContext);
+  React.useContext(FirestoreAuthContext)?.user ?? null;

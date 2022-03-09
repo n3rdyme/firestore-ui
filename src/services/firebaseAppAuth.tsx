@@ -7,9 +7,13 @@
  */
 import {
   getAuth,
-  GoogleAuthProvider,
   signInWithPopup,
+  AuthProvider,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  GithubAuthProvider,
   User,
+  signOut,
 } from "firebase/auth";
 import React, {
   HTMLProps,
@@ -18,21 +22,28 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { FcGoogle } from "react-icons/fc";
-import { Spinner } from "../components/spinner";
-import { AuthenticatedUserContext } from "./authenticatedUser";
+import {
+  FirestoreAuthContext,
+  FirestoreAuthController,
+} from "./authenticatedUser";
 import { useFirebaseApp } from "./firebaseApp";
 
 export function FirebaseAppAuth({
   children,
 }: Pick<HTMLProps<HTMLDivElement>, "children">) {
   const firebaseApp = useFirebaseApp();
-  const auth = useMemo(() => getAuth(firebaseApp ?? undefined), [firebaseApp]);
+  const auth = useMemo(
+    () => (!firebaseApp ? null : getAuth(firebaseApp ?? undefined)),
+    [firebaseApp]
+  );
   const [loaded, setLoaded] = useState(false);
   const [fbUser, setFbUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((user) => {
+    if (!auth) {
+      return undefined;
+    }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       setFbUser((current) => {
         if (
           current?.uid === user?.uid &&
@@ -47,43 +58,78 @@ export function FirebaseAppAuth({
       });
       setLoaded(true);
     });
-    return unsub;
+    return unsubscribe;
   });
 
-  const loginClick = useCallback(() => {
-    if (!fbUser || fbUser.isAnonymous) {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth, provider).catch((ex) => {
-        console.error(ex);
-      });
+  const login = useCallback<FirestoreAuthController["login"]>(
+    (provider) => {
+      if (!auth) {
+        return Promise.reject(new Error("No database connected."));
+      }
+
+      let authProvider: AuthProvider;
+      if (provider === "google") {
+        authProvider = new GoogleAuthProvider();
+      } else if (provider === "github") {
+        authProvider = new GithubAuthProvider();
+      } else if (provider === "email") {
+        authProvider = new EmailAuthProvider();
+      } else {
+        return Promise.reject(new Error(`Unknown provider: ${provider}`));
+      }
+
+      return signInWithPopup(auth, authProvider)
+        .then((usr) => {
+          /* do nothing */
+        })
+        .catch((ex) => {
+          console.error(ex);
+          throw ex;
+        });
+    },
+    [auth]
+  );
+
+  const logout = useCallback(() => {
+    if (!auth) {
+      return Promise.reject(new Error("No database connected."));
     }
-  }, [auth, fbUser]);
 
-  if (!loaded) {
-    return <Spinner />;
-  }
+    return signOut(auth).catch((ex) => {
+      console.error(ex);
+    });
+  }, [auth]);
 
-  if (!fbUser || fbUser.isAnonymous) {
-    return (
-      <div className="flex flex-col flex-grow">
-        <div className="flex-grow" />
-        <div className="flex flex-col items-center">
-          <button
-            type="button"
-            onClick={loginClick}
-            className="flex flex-row items-center bg-light h-10 p-2 font-bold"
-          >
-            <FcGoogle size="2em" />
-            Login With Google
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // if (!loaded) {
+  //   return <Spinner />;
+  // }
+
+  // if (!fbUser || fbUser.isAnonymous) {
+  //   return (
+  //     <div className="flex flex-col flex-grow">
+  //       <div className="flex-grow" />
+  //       <div className="flex flex-col items-center">
+  //         <button
+  //           type="button"
+  //           onClick={loginClick}
+  //           className="flex flex-row items-center bg-light h-10 p-2 font-bold"
+  //         >
+  //           <FcGoogle size="2em" />
+  //           Login With Google
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  const authContext = useMemo(
+    () => ({ user: fbUser, login, logout }),
+    [fbUser, login, logout]
+  );
 
   return (
-    <AuthenticatedUserContext.Provider value={fbUser}>
+    <FirestoreAuthContext.Provider value={!loaded ? null : authContext}>
       {children}
-    </AuthenticatedUserContext.Provider>
+    </FirestoreAuthContext.Provider>
   );
 }

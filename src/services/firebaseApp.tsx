@@ -12,7 +12,12 @@ import {
   initializeApp,
   deleteApp,
 } from "firebase/app";
-import React, { useEffect, useState } from "react";
+import {
+  Firestore,
+  getFirestore,
+  initializeFirestore,
+} from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
 
 export function useFirebaseAppConnection(
   name: string,
@@ -32,6 +37,7 @@ export function useFirebaseAppConnection(
 }
 
 export const FirebaseAppContext = React.createContext<FirebaseApp | null>(null);
+export const FirestoreDBContext = React.createContext<Firestore | null>(null);
 
 export function FirebaseAppConnection({
   name,
@@ -42,11 +48,26 @@ export function FirebaseAppConnection({
   config: FirebaseOptions;
 } & Pick<React.HTMLProps<HTMLDivElement>, "children">) {
   const fbApp = useFirebaseAppConnection(name, config);
+  const firestoreDb = useMemo(() => {
+    if (!fbApp) {
+      return null;
+    }
+
+    initializeFirestore(fbApp, {
+      ignoreUndefinedProperties: true,
+    });
+
+    return getFirestore(fbApp);
+  }, [fbApp]);
+
   return (
     <FirebaseAppContext.Provider value={fbApp}>
-      {children}
+      <FirestoreDBContext.Provider value={firestoreDb}>
+        {children}
+      </FirestoreDBContext.Provider>
     </FirebaseAppContext.Provider>
   );
 }
 
 export const useFirebaseApp = () => React.useContext(FirebaseAppContext);
+export const useFirestore = () => React.useContext(FirestoreDBContext);
