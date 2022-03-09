@@ -18,6 +18,12 @@ export function AppHeader() {
         <img src="/images/firebase_28dp.png" alt="logo" className="h-8" />
         <span>firebase-ui.com</span>
       </Link>
+      <div className="flex-grow" />
+      <div>
+        <Link to="/connect" className="btn bg-primary text-dark w-32">
+          Connect!
+        </Link>
+      </div>
     </header>
   );
 }
