@@ -51,7 +51,7 @@
     "build": "npm run css && react-scripts build",
     "lint": "./node_modules/.bin/tsc --noEmit && ./node_modules/.bin/eslint ./src --ext .ts,.tsx,.js,.jsx",
     "test": "npm run lint",
-    "deploy": "../node_modules/.bin/firebase deploy --only hosting"
+    "deploy": "./node_modules/.bin/firebase deploy --only hosting"
   },
   "browserslist": {
     "production": [
