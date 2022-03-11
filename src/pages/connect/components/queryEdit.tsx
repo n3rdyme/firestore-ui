@@ -5,19 +5,29 @@
  * Created On: March 9th, 2022
  * ****************************************************************************
  */
-import { query } from "firebase/firestore";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import Editor from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { GenericSQL, SqlParserVisitor } from "dt-sql-parser";
 import { CardMessage } from "../../../components/cardMessage";
+import {
+  ParserError,
+  SqlStatementVisitor,
+} from "../../../services/sqlStatementVisitor";
 
 export interface QueryEditProps {
   value: string | undefined;
   onChange: (query: string | undefined) => void;
 }
-
 export function QueryEdit({ value, onChange }: QueryEditProps) {
-  const [error, setError] = React.useState<string | null>(null);
+  const [errors, setErrors] = React.useState<ParserError[] | null>(null);
+
+  useEffect(() => {
+    if (!value) return;
+    const { errors: errs, statements } = SqlStatementVisitor.parseSql(value);
+    setErrors(errs);
+    console.log({ statements });
+  }, [value]);
 
   return (
     <div className="flex-grow flex flex-col">
@@ -33,11 +43,12 @@ export function QueryEdit({ value, onChange }: QueryEditProps) {
           onChange={onChange}
         />
       </div>
-      {!!error && (
+      {!!errors?.length && (
         <CardMessage
-          className="bg-red-200 p-2 text-danger rounded-none"
+          textSize="text-sm"
+          className="bg-orange-200 text-sm p-1 px-2 text-danger rounded-none"
           iconType={FaExclamationTriangle}
-          message={error}
+          message={`(${errors[0].startLine}:${errors[0].startCol}) ${errors[0].message}`}
         />
       )}
     </div>

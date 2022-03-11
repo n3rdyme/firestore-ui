@@ -14,21 +14,25 @@ export function CardMessage({
   message,
   className,
   iconType: Icon,
+  textSize,
 }: {
   message?: string | null;
   className?: string;
   iconType?: IconType;
+  textSize?: "text-xs" | "text-sm" | "text-base" | "text-lg";
 }) {
   if (!message) {
     return null;
   }
   return (
     <div
-      className={`flex flex-row items-center flex-wrap p-4 rounded-lg shadow-lg ${className}`}
+      className={`flex flex-row items-center flex-wrap p-4 rounded-lg shadow-lg ${className} ${
+        textSize || "text-lg"
+      }`}
     >
       {!!Icon && <Icon />}
       <div className="m-1" />
-      <div className="text-lg">{message}</div>
+      <div>{message}</div>
     </div>
   );
 }

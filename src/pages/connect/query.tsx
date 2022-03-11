@@ -26,7 +26,7 @@ export function DatabaseQuery() {
       minSize={50}
       defaultSize={180}
       top={<QueryEdit value={query} onChange={setQuery} />}
-      bottom={<div>part13</div>}
+      bottom={<div>Results will be here</div>}
     />
   );
 }
