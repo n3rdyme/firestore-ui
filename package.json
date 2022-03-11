@@ -53,8 +53,8 @@
     "start": "npm run css && react-scripts start -- --port=3000",
     "build": "npm run css && react-scripts build",
     "lint": "./node_modules/.bin/tsc --noEmit && ./node_modules/.bin/eslint ./src --ext .ts,.tsx,.js,.jsx",
-    "pretest": "npm run lint",
-    "test": "CI=true react-scripts test --all",
+    "jest": "CI=true react-scripts test --all",
+    "test": "npm run lint && npm run jest",
     "deploy": "./node_modules/.bin/firebase deploy --only hosting"
   },
   "browserslist": {

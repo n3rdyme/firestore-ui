@@ -13,6 +13,9 @@
   "[typescript]": {
     "editor.formatOnSave": false
   },
+  "[antlr]": {
+    "editor.formatOnSave": false
+  },
   // "eslint.autoFixOnSave": true, // has been deprecated, use editor.codeActionsOnSave instead
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true

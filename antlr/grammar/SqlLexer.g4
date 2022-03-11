@@ -1166,7 +1166,8 @@ FILESIZE_LITERAL:                    DEC_DIGIT+ ('K'|'M'|'G'|'T');
 
 
 START_NATIONAL_STRING_LITERAL:       'N' SQUOTA_STRING;
-STRING_LITERAL:                      DQUOTA_STRING | SQUOTA_STRING | BQUOTA_STRING;
+// STRING_LITERAL:                      DQUOTA_STRING | SQUOTA_STRING | BQUOTA_STRING;
+STRING_LITERAL:                      SQUOTA_STRING;
 DECIMAL_LITERAL:                     DEC_DIGIT+;
 HEXADECIMAL_LITERAL:                 'X' '\'' (HEX_DIGIT HEX_DIGIT)+ '\''
                                      | '0X' HEX_DIGIT+;
@@ -1193,8 +1194,9 @@ DOT_ID:                              '.' ID_LITERAL;
 // Identifiers
 
 ID:                                  ID_LITERAL;
-DOUBLE_QUOTE_ID:                     '"' ~'"'+ '"';
-REVERSE_QUOTE_ID:                    '`' ~'`'+ '`';
+DOUBLE_QUOTE_ID:                     DQUOTA_STRING;
+REVERSE_QUOTE_ID:                    BQUOTA_STRING;
+BLOCKED_QUOTE_ID:                    '[' ~(']')* ']';
 STRING_USER_NAME:                    (
                                        SQUOTA_STRING | DQUOTA_STRING
                                        | BQUOTA_STRING | ID_LITERAL

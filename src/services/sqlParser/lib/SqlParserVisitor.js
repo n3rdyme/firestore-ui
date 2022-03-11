@@ -36,36 +36,6 @@ SqlParserVisitor.prototype.visitSqlStatement = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#emptyStatement.
-SqlParserVisitor.prototype.visitEmptyStatement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#dmlStatement.
-SqlParserVisitor.prototype.visitDmlStatement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#deleteStatement.
-SqlParserVisitor.prototype.visitDeleteStatement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#simpleSelect.
-SqlParserVisitor.prototype.visitSimpleSelect = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#updateStatement.
-SqlParserVisitor.prototype.visitUpdateStatement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by SqlParser#insertStatement.
 SqlParserVisitor.prototype.visitInsertStatement = function(ctx) {
   return this.visitChildren(ctx);
@@ -78,26 +48,44 @@ SqlParserVisitor.prototype.visitInsertStatementValue = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#updateStatement.
+SqlParserVisitor.prototype.visitUpdateStatement = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#updatedElement.
 SqlParserVisitor.prototype.visitUpdatedElement = function(ctx) {
   return this.visitChildren(ctx);
 };
 
 
-// Visit a parse tree produced by SqlParser#assignmentField.
-SqlParserVisitor.prototype.visitAssignmentField = function(ctx) {
+// Visit a parse tree produced by SqlParser#deleteStatement.
+SqlParserVisitor.prototype.visitDeleteStatement = function(ctx) {
   return this.visitChildren(ctx);
 };
 
 
-// Visit a parse tree produced by SqlParser#singleDeleteStatement.
-SqlParserVisitor.prototype.visitSingleDeleteStatement = function(ctx) {
+// Visit a parse tree produced by SqlParser#selectStatement.
+SqlParserVisitor.prototype.visitSelectStatement = function(ctx) {
   return this.visitChildren(ctx);
 };
 
 
-// Visit a parse tree produced by SqlParser#singleUpdateStatement.
-SqlParserVisitor.prototype.visitSingleUpdateStatement = function(ctx) {
+// Visit a parse tree produced by SqlParser#selectElements.
+SqlParserVisitor.prototype.visitSelectElements = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#selectElement.
+SqlParserVisitor.prototype.visitSelectElement = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#fromClause.
+SqlParserVisitor.prototype.visitFromClause = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -114,56 +102,8 @@ SqlParserVisitor.prototype.visitOrderByExpression = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#tableSources.
-SqlParserVisitor.prototype.visitTableSources = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#tableSourceBase.
-SqlParserVisitor.prototype.visitTableSourceBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#tableSourceItem.
-SqlParserVisitor.prototype.visitTableSourceItem = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#querySpecification.
-SqlParserVisitor.prototype.visitQuerySpecification = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#selectElements.
-SqlParserVisitor.prototype.visitSelectElements = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#selectStarElement.
-SqlParserVisitor.prototype.visitSelectStarElement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#selectColumnElement.
-SqlParserVisitor.prototype.visitSelectColumnElement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#selectConstantElement.
-SqlParserVisitor.prototype.visitSelectConstantElement = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#fromClause.
-SqlParserVisitor.prototype.visitFromClause = function(ctx) {
+// Visit a parse tree produced by SqlParser#tableSource.
+SqlParserVisitor.prototype.visitTableSource = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -194,12 +134,6 @@ SqlParserVisitor.prototype.visitTableName = function(ctx) {
 
 // Visit a parse tree produced by SqlParser#fullColumnName.
 SqlParserVisitor.prototype.visitFullColumnName = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#mysqlVariable.
-SqlParserVisitor.prototype.visitMysqlVariable = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -252,8 +186,14 @@ SqlParserVisitor.prototype.visitHexadecimalLiteral = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#nullNotnull.
-SqlParserVisitor.prototype.visitNullNotnull = function(ctx) {
+// Visit a parse tree produced by SqlParser#constNumberLiteral.
+SqlParserVisitor.prototype.visitConstNumberLiteral = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#nullLiteral.
+SqlParserVisitor.prototype.visitNullLiteral = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -264,20 +204,14 @@ SqlParserVisitor.prototype.visitConstant = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#constantOrDefault.
+SqlParserVisitor.prototype.visitConstantOrDefault = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#uidList.
 SqlParserVisitor.prototype.visitUidList = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#expressions.
-SqlParserVisitor.prototype.visitExpressions = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#expressionsWithDefaults.
-SqlParserVisitor.prototype.visitExpressionsWithDefaults = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -288,26 +222,8 @@ SqlParserVisitor.prototype.visitConstants = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#simpleStrings.
-SqlParserVisitor.prototype.visitSimpleStrings = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#defaultValue.
-SqlParserVisitor.prototype.visitDefaultValue = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#currentTimestamp.
-SqlParserVisitor.prototype.visitCurrentTimestamp = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#expressionOrDefault.
-SqlParserVisitor.prototype.visitExpressionOrDefault = function(ctx) {
+// Visit a parse tree produced by SqlParser#constantsOrDefaults.
+SqlParserVisitor.prototype.visitConstantsOrDefaults = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -374,12 +290,6 @@ SqlParserVisitor.prototype.visitExpressionAtomPredicate = function(ctx) {
 
 // Visit a parse tree produced by SqlParser#constantAtoms.
 SqlParserVisitor.prototype.visitConstantAtoms = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#expressionAtoms.
-SqlParserVisitor.prototype.visitExpressionAtoms = function(ctx) {
   return this.visitChildren(ctx);
 };
 

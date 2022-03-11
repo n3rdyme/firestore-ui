@@ -5,27 +5,18 @@
  * Created On: March 9th, 2022
  * ****************************************************************************
  */
-import React, { useEffect } from "react";
+import React from "react";
 import Editor from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { CardMessage } from "../../../components/cardMessage";
-import { SqlStatementVisitor } from "../../../services/sqlStatementVisitor";
 import { ParserError } from "../../../services/sqlParser";
 
 export interface QueryEditProps {
   value: string | undefined;
+  errors?: ParserError[];
   onChange: (query: string | undefined) => void;
 }
-export function QueryEdit({ value, onChange }: QueryEditProps) {
-  const [errors, setErrors] = React.useState<ParserError[] | null>(null);
-
-  useEffect(() => {
-    if (!value) return;
-    const { errors: errs, statements } = SqlStatementVisitor.parseSql(value);
-    setErrors(errs);
-    console.log({ statements });
-  }, [value]);
-
+export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
   return (
     <div className="flex-grow flex flex-col">
       <div className="flex flex-col flex-grow relative">

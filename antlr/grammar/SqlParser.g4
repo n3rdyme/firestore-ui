@@ -34,34 +34,16 @@ statement
     ;
 
 sqlStatements
-    : (sqlStatement MINUSMINUS? SEMI? | emptyStatement)*
-    (sqlStatement (MINUSMINUS? SEMI)? | emptyStatement)
+    : (sqlStatement MINUSMINUS? SEMI? | SEMI)*
+    (sqlStatement (MINUSMINUS? SEMI)? | SEMI)
     ;
 
 sqlStatement
-    : dmlStatement
-    ;
-
-emptyStatement
-    : SEMI
-    ;
-
-dmlStatement
     : selectStatement | insertStatement | updateStatement
     | deleteStatement 
     ;
 
-deleteStatement
-    : singleDeleteStatement
-    ;
-
-selectStatement
-    : querySpecification                                #simpleSelect
-    ;
-
-updateStatement
-    : singleUpdateStatement
-    ;
+/** INSERT */
 
 insertStatement
     : INSERT
@@ -77,53 +59,35 @@ insertStatement
 insertStatementValue
     : 
     insertFormat=(VALUES | VALUE)
-      '(' expressionsWithDefaults? ')'
-        (',' '(' expressionsWithDefaults? ')')*
+      '(' constantsOrDefaults ')'
+        (',' '(' constantsOrDefaults ')')*
+    ;
+
+/** UPDATE */
+
+updateStatement
+    : UPDATE 
+      tableName (AS? alias=uid)?
+      SET updatedElement (',' updatedElement)*
+      (WHERE whereExp=expression)? orderByClause? limitClause?
     ;
 
 updatedElement
     : fullColumnName '=' (constOrColumnAtom | DEFAULT)
     ;
 
-assignmentField
-    : uid | LOCAL_ID
-    ;
+/** DELETE */
 
-singleDeleteStatement
+deleteStatement
     : DELETE
     FROM tableName
-      (WHERE expression)?
+      (WHERE whereExp=expression)?
       orderByClause? (LIMIT limitClauseAtom)?
     ;
 
-singleUpdateStatement
-    : UPDATE 
-      tableName (AS? uid)?
-      SET updatedElement (',' updatedElement)*
-      (WHERE expression)? orderByClause? limitClause?
-    ;
+/** SELECT */
 
-orderByClause
-    : ORDER BY orderByExpression (',' orderByExpression)*
-    ;
-
-orderByExpression
-    : fullColumnName order=(ASC | DESC)?
-    ;
-
-tableSources
-    : tableSource (',' tableSource)*
-    ;
-
-tableSource
-    : tableSourceItem                                     #tableSourceBase
-    ;
-
-tableSourceItem
-    : tableName (AS? alias=uid)?
-    ;
-
-querySpecification
+selectStatement
     : SELECT selectElements
       (fromClause orderByClause? limitClause?)?
     ;
@@ -134,13 +98,27 @@ selectElements
     ;
 
 selectElement
-    : fullId '.' '*'                                                #selectStarElement
-    | fullColumnName (AS? uid)?                                     #selectColumnElement
-    | constant (AS? uid)?                                           #selectConstantElement
+    : starOf=fullId '.' '*'
+    | column=fullColumnName (AS? alias=uid)?
+    | value=constant (AS? alias=uid)?
     ;
 
+/** SHARED */
+
 fromClause
-    : FROM tableSource (WHERE whereExpr=expression)?
+    : FROM tableSource (WHERE whereExp=expression)?
+    ;
+
+orderByClause
+    : ORDER BY orderByExpression (',' orderByExpression)*
+    ;
+
+orderByExpression
+    : orderOn=fullColumnName orderBy=(ASC | DESC)?
+    ;
+
+tableSource
+    : tableName (AS? alias=uid)?
     ;
 
 limitClause
@@ -160,31 +138,27 @@ fullId
     ;
 
 tableName
-    : fullId
+    : table=fullId
     ;
 
 fullColumnName
     : uid dottedId*
     ;
 
-mysqlVariable
-    : LOCAL_ID
-    | GLOBAL_ID
-    ;
-
 engineName
     : ARCHIVE | BLACKHOLE | CSV | FEDERATED | INNODB | MEMORY
     | MRG_MYISAM | MYISAM | NDB | NDBCLUSTER | PERFORMANCE_SCHEMA
     | TOKUDB
-    | ID
-    | STRING_LITERAL | REVERSE_QUOTE_ID
+    // | ID
+    // | STRING_LITERAL | REVERSE_QUOTE_ID
     ;
 
 uid
     : simpleId
     | DOUBLE_QUOTE_ID
     | REVERSE_QUOTE_ID
-    | CHARSET_REVERSE_QOUTE_STRING
+    | BLOCKED_QUOTE_ID
+    // | CHARSET_REVERSE_QOUTE_STRING
     ;
 
 simpleId
@@ -218,54 +192,40 @@ booleanLiteral
 hexadecimalLiteral
     : STRING_CHARSET_NAME? HEXADECIMAL_LITERAL;
 
-nullNotnull
-    : NOT? (NULL_LITERAL | NULL_SPEC_LITERAL)
+constNumberLiteral
+    : 
+    | decimalLiteral
+    | negative='-' decimalLiteral
+    | REAL_LITERAL
+    | negative='-' REAL_LITERAL
+    ;
+
+nullLiteral
+    : NULL_LITERAL | NULL_SPEC_LITERAL
     ;
 
 constant
-    : stringLiteral | decimalLiteral
-    | '-' decimalLiteral
-    | hexadecimalLiteral | booleanLiteral
-    | REAL_LITERAL | BIT_STRING
-    | NOT? nullLiteral=(NULL_LITERAL | NULL_SPEC_LITERAL)
+    : stringLiteral 
+    | constNumberLiteral
+    | hexadecimalLiteral 
+    | booleanLiteral
+    | nullLiteral
     ;
 
+constantOrDefault
+    : constant | DEFAULT
+    ;
+    
 uidList
     : uid (',' uid)*
-    ;
-
-expressions
-    : expression (',' expression)*
-    ;
-
-expressionsWithDefaults
-    : expressionOrDefault (',' expressionOrDefault)*
     ;
 
 constants
     : constant (',' constant)*
     ;
 
-simpleStrings
-    : STRING_LITERAL (',' STRING_LITERAL)*
-    ;
-
-defaultValue
-    : NULL_LITERAL
-    | constant
-    | currentTimestamp
-    ;
-
-currentTimestamp
-    :
-    (
-      (CURRENT_TIMESTAMP | LOCALTIME | LOCALTIMESTAMP) ('(' ')')?
-      | NOW '(' ')'
-    )
-    ;
-
-expressionOrDefault
-    : expression | DEFAULT
+constantsOrDefaults
+    : constantOrDefault (',' constantOrDefault)*
     ;
 
 expression
@@ -276,7 +236,7 @@ expression
 
 predicate
     : expressionAtom NOT? IN '(' (constantAtoms) ')'                     #inPredicate
-    | expressionAtom IS nullNotnull                                      #isNullPredicate
+    | expressionAtom IS NOT? nullLiteral                                 #isNullPredicate
     | left=expressionAtom comparisonOperator right=expressionAtom        #binaryComparasionPredicate
     | expressionAtom NOT? BETWEEN expressionAtom AND expressionAtom      #betweenPredicate
     | expressionAtom NOT? LIKE STRING_LITERAL                            #likePredicate
@@ -286,10 +246,6 @@ predicate
 
 constantAtoms
     : constant (',' constant)*
-    ;
-
-expressionAtoms
-    : expressionAtom (',' expressionAtom)*
     ;
 
 constOrColumnAtom
