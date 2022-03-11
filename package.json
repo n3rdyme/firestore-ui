@@ -49,10 +49,12 @@
   "scripts": {
     "css": "./node_modules/.bin/tailwindcss -i ./src/styles/index.css -o ./src/styles/output.css",
     "css:watch": "npm run css -- --watch",
+    "antlr4": "node ./antlr/antlr4.js",
     "start": "npm run css && react-scripts start -- --port=3000",
     "build": "npm run css && react-scripts build",
     "lint": "./node_modules/.bin/tsc --noEmit && ./node_modules/.bin/eslint ./src --ext .ts,.tsx,.js,.jsx",
-    "test": "npm run lint",
+    "pretest": "npm run lint",
+    "test": "CI=true react-scripts test --all",
     "deploy": "./node_modules/.bin/firebase deploy --only hosting"
   },
   "browserslist": {

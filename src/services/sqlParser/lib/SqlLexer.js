@@ -1,6 +1,6 @@
-// Generated from /home/rogerk/projects/rogerk/dt-sql-parser/src/grammar/reduced/SqlLexer.g4 by ANTLR 4.8
+// Generated from /home/rogerk/projects/rogerk/firestore-ui/antlr/grammar/SqlLexer.g4 by ANTLR 4.8
 // jshint ignore: start
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 
 
 

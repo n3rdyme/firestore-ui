@@ -7,11 +7,11 @@
  */
 import { CommonTokenStream, Lexer, Parser } from "antlr4";
 import CaseInsensitiveStream from "./common/caseInsensitiveStream";
-import { SqlLexer } from "../lib/reduced/SqlLexer";
-import { SqlParser } from "../lib/reduced/SqlParser";
+import { SqlLexer } from "../lib/SqlLexer";
+import { SqlParser } from "../lib/SqlParser";
 import BasicParser from "./common/basicParser";
 
-export default class GenericSQL extends BasicParser {
+export class GenericSQL extends BasicParser {
   public createLexer(input: string): Lexer {
     const chars = new CaseInsensitiveStream(input); // Some Lexer only support uppercase token, So you need transform
     return new SqlLexer(chars) as any;

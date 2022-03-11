@@ -6,8 +6,7 @@
  * ****************************************************************************
  */
 
-export * from "./parser";
+export * from "./parser/genericSQL";
 export * from "./parser/common/interfaceTypes";
 
-export * from "./lib/reduced/SqlParserVisitor";
-export * from "./lib/reduced/SqlParserListener";
+export * from "./lib/SqlParserVisitor";

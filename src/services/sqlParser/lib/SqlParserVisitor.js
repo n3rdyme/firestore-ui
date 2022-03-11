@@ -1,6 +1,6 @@
-// Generated from /home/rogerk/projects/rogerk/dt-sql-parser/src/grammar/reduced/SqlParser.g4 by ANTLR 4.8
+// Generated from /home/rogerk/projects/rogerk/firestore-ui/antlr/grammar/SqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
-var antlr4 = require('antlr4');
+var antlr4 = require('antlr4/index');
 
 // This class defines a complete generic visitor for a parse tree produced by SqlParser.
 
