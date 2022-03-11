@@ -9,10 +9,8 @@ import React, { useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { CardMessage } from "../../../components/cardMessage";
-import {
-  ParserError,
-  SqlStatementVisitor,
-} from "../../../services/sqlStatementVisitor";
+import { SqlStatementVisitor } from "../../../services/sqlStatementVisitor";
+import { ParserError } from "../../../services/sqlParser";
 
 export interface QueryEditProps {
   value: string | undefined;
