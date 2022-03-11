@@ -7803,6 +7803,7 @@ NotExpressionContext.prototype.accept = function(visitor) {
 
 function LogicalExpressionContext(parser, ctx) {
 	ExpressionContext.call(this, parser);
+    this.op = null; // LogicalOperatorContext;
     ExpressionContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -7921,7 +7922,7 @@ SqlParser.prototype.expression = function(_p) {
                     throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 2)");
                 }
                 this.state = 415;
-                this.logicalOperator();
+                localctx.op = this.logicalOperator();
                 this.state = 416;
                 this.expression(3); 
             }
@@ -8114,6 +8115,7 @@ IsNullPredicateContext.prototype.accept = function(visitor) {
 function BinaryComparasionPredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
     this.left = null; // ExpressionAtomContext;
+    this.op = null; // ComparisonOperatorContext;
     this.right = null; // ExpressionAtomContext;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
@@ -8124,10 +8126,6 @@ BinaryComparasionPredicateContext.prototype.constructor = BinaryComparasionPredi
 
 SqlParser.BinaryComparasionPredicateContext = BinaryComparasionPredicateContext;
 
-BinaryComparasionPredicateContext.prototype.comparisonOperator = function() {
-    return this.getTypedRuleContext(ComparisonOperatorContext,0);
-};
-
 BinaryComparasionPredicateContext.prototype.expressionAtom = function(i) {
     if(i===undefined) {
         i = null;
@@ -8137,6 +8135,10 @@ BinaryComparasionPredicateContext.prototype.expressionAtom = function(i) {
     } else {
         return this.getTypedRuleContext(ExpressionAtomContext,i);
     }
+};
+
+BinaryComparasionPredicateContext.prototype.comparisonOperator = function() {
+    return this.getTypedRuleContext(ComparisonOperatorContext,0);
 };
 BinaryComparasionPredicateContext.prototype.accept = function(visitor) {
     if ( visitor instanceof SqlParserVisitor ) {
@@ -8284,7 +8286,7 @@ SqlParser.prototype.predicate = function() {
             this.state = 439;
             localctx.left = this.expressionAtom();
             this.state = 440;
-            this.comparisonOperator();
+            localctx.op = this.comparisonOperator();
             this.state = 441;
             localctx.right = this.expressionAtom();
             break;

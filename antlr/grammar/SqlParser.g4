@@ -230,14 +230,14 @@ constantsOrDefaults
 
 expression
     : notOperator=(NOT | '!') expression                            #notExpression
-    | expression logicalOperator expression                         #logicalExpression
+    | expression op=logicalOperator expression                      #logicalExpression
     | predicate                                                     #predicateExpression
     ;
 
 predicate
     : expressionAtom NOT? IN '(' (constantAtoms) ')'                     #inPredicate
     | expressionAtom IS NOT? nullLiteral                                 #isNullPredicate
-    | left=expressionAtom comparisonOperator right=expressionAtom        #binaryComparasionPredicate
+    | left=expressionAtom op=comparisonOperator right=expressionAtom     #binaryComparasionPredicate
     | expressionAtom NOT? BETWEEN expressionAtom AND expressionAtom      #betweenPredicate
     | expressionAtom NOT? LIKE STRING_LITERAL                            #likePredicate
     | expressionAtom NOT? regex=(REGEXP | RLIKE) STRING_LITERAL          #regexpPredicate

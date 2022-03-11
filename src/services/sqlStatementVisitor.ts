@@ -8,7 +8,14 @@
 import { ParserRuleContext as AParserRuleContext } from "antlr4";
 import { SqlParser } from "./sqlParser/lib/SqlParser";
 import { GenericSQL, ParserError, SqlParserVisitor } from "./sqlParser";
-import { SqlColumn, SqlOrder, SqlStatement, SqlValue } from "./sqlStatement";
+import {
+  SqlColumn,
+  SqlCondition as SqlPredicate,
+  SqlExpression,
+  SqlOrder,
+  SqlStatement,
+  SqlValue,
+} from "./sqlStatement";
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
@@ -188,110 +195,94 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     return this.visitChildren(ctx);
   }
 
-  // Visit a parse tree produced by SqlParser#limitClauseAtom.
-  override visitLimitClauseAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
   // Visit a parse tree produced by SqlParser#fullId.
   override visitFullId(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#tableName.
   override visitTableName(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#fullColumnName.
   override visitFullColumnName(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#engineName.
-  override visitEngineName(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#uid.
   override visitUid(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#simpleId.
   override visitSimpleId(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#dottedId.
   override visitDottedId(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#decimalLiteral.
   override visitDecimalLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "number";
-      this.currentValue.value = ctx.getText();
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "number",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#decimalLiteral.
   override visitConstNumberLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "number";
-      this.currentValue.value = ctx.getText();
-      return undefined;
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "number",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#stringLiteral.
   override visitStringLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "string";
-      this.currentValue.value = ctx.getText();
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "string",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#booleanLiteral.
   override visitBooleanLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "boolean";
-      this.currentValue.value = ctx.getText();
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "boolean",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#hexadecimalLiteral.
   override visitHexadecimalLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "hexadecimal";
-      this.currentValue.value = ctx.getText();
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "hexadecimal",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#nullNotnull.
   override visitNullLiteral(ctx: ParserRuleContext) {
-    if (this.currentValue) {
-      this.currentValue.type = "null";
-      this.currentValue.value = ctx.getText();
-    }
-
-    return this.visitChildren(ctx);
+    const value: SqlValue = {
+      type: "null",
+      value: ctx.getText(),
+    };
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#constant.
   override visitConstant(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [datum] = this.visitChildren(ctx);
+    return datum;
   }
 
   // Visit a parse tree produced by SqlParser#uidList.
@@ -306,12 +297,22 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#notExpression.
   override visitNotExpression(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const result = this.visitChildren(ctx);
+    result.not = !result.not;
+    return result;
   }
 
   // Visit a parse tree produced by SqlParser#logicalExpression.
   override visitLogicalExpression(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const exp: SqlExpression = {};
+    const [left, op, right] = this.visitChildren(ctx);
+    if (op === "AND") {
+      exp.and = [left, right];
+    } else {
+      exp.or = [left, right];
+    }
+    console.log(exp);
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#predicateExpression.
@@ -331,7 +332,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#binaryComparasionPredicate.
   override visitBinaryComparasionPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [left, op, right] = this.visitChildren(ctx);
+    const predicate: SqlPredicate = { left, op, right };
+    return predicate;
   }
 
   // Visit a parse tree produced by SqlParser#betweenPredicate.
@@ -361,37 +364,46 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#constantValueAtom.
   override visitConstantValueAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#fullColumnNameValueAtom.
   override visitFullColumnNameValueAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#constantExpressionAtom.
   override visitConstantExpressionAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#fullColumnNameExpressionAtom.
   override visitFullColumnNameExpressionAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#nestedExpressionAtom.
   override visitNestedExpressionAtom(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [child] = this.visitChildren(ctx);
+    return child;
   }
 
   // Visit a parse tree produced by SqlParser#comparisonOperator.
   override visitComparisonOperator(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return ctx.getText();
   }
 
   // Visit a parse tree produced by SqlParser#logicalOperator.
   override visitLogicalOperator(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const op = ctx.getText();
+    if (op[0] === "A" || op[0] === "a" || op[0] === "&") {
+      return "AND";
+    }
+    return "OR";
   }
 
   // Visit a parse tree produced by SqlParser#charsetNameBase.

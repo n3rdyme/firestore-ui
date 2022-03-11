@@ -40,6 +40,7 @@ export interface SqlCondition {
 }
 
 export interface SqlExpression {
+  not?: boolean;
   and?: (SqlExpression | SqlCondition)[];
   or?: (SqlExpression | SqlCondition)[];
 }
