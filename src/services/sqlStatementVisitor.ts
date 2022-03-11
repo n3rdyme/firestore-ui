@@ -5,7 +5,7 @@
  * Created On: March 10th, 2022
  * ****************************************************************************
  */
-import { GenericSQL, SqlParserVisitor } from "dt-sql-parser";
+import { GenericSQL, SqlParserVisitor } from "./sqlParser";
 
 export interface ParserError {
   startLine: number;
@@ -27,7 +27,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     let statements: any[] | undefined;
     if (!errors?.length) {
       const visitor = new SqlStatementVisitor();
-      visitor.visitSelectSpec(tree);
+      visitor.visitProgram(tree);
       statements = visitor.statements;
     }
 

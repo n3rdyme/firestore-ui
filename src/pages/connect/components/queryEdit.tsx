@@ -5,10 +5,9 @@
  * Created On: March 9th, 2022
  * ****************************************************************************
  */
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { GenericSQL, SqlParserVisitor } from "dt-sql-parser";
 import { CardMessage } from "../../../components/cardMessage";
 import {
   ParserError,
