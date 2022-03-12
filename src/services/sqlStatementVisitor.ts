@@ -28,12 +28,9 @@ type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 export class SqlStatementVisitor extends SqlParserVisitor {
   private readonly output: SqlStatement[];
 
-  private readonly statements: SqlStatement[];
-
   constructor(statements: any[]) {
     super();
     this.output = statements;
-    this.statements = [];
   }
 
   static parseSql(sql: string) {
@@ -48,29 +45,67 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
     const statements: SqlStatement[] = [];
     if (!errors?.length) {
-      const visitor = new SqlStatementVisitor(statements);
-      visitor.visitProgram(tree);
-      // console.debug(statements);
+      try {
+        const visitor = new SqlStatementVisitor(statements);
+        visitor.visitProgram(tree);
+      } catch (e: unknown) {
+        const error: any = e;
+
+        const newError: ParserError = {
+          startCol: 0,
+          endCol: 0,
+          startLine: 0,
+          endLine: 0,
+          message: error?.message ?? "Unknown error",
+        };
+
+        if (error.syntaxTree != null) {
+          const { startPos, endPos } = error;
+          newError.startLine = startPos?.line;
+          newError.startCol = startPos?.column;
+          newError.endLine = endPos?.line ?? startPos?.line;
+          newError.endCol = endPos?.column ?? startPos?.column;
+        }
+
+        console.error(error, newError);
+        errors.push(newError);
+      }
     }
 
     return { errors, statements };
   }
 
-  visit(ctx: ParserRuleContext): any {
-    return SqlParserVisitor.prototype.visit.call(this, ctx);
+  private errorWithContext(
+    err: Error & { [key: string]: any },
+    ctx: ParserRuleContext
+  ) {
+    if (err?.syntaxTree == null) {
+      let syntaxTree = "";
+      try {
+        const pTemp = new GenericSQL();
+        pTemp.createParser("");
+        syntaxTree = pTemp.toString(ctx);
+      } catch (_ignore: unknown) {
+        /* */
+      }
+      const { start, stop } = ctx;
+      Object.assign(err, {
+        message: `${err.message}\nat ${syntaxTree}`,
+        startPos: start,
+        endPos: stop,
+        syntaxTree: syntaxTree || "-",
+      });
+    }
+    return err;
   }
 
-  private visitChildren(ctx: ParserRuleContext) {
-    return SqlParserVisitor.prototype.visitChildren.call(this, ctx);
-  }
-
-  // visitTerminal(node: TerminalNode): any;
-
-  // visitErrorNode(node: ErrorNode): any;
-
-  // Visit a parse tree produced by SqlParser#program.
-  override visitProgram(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+  visitChildren(ctx: ParserRuleContext) {
+    try {
+      // console.log({ enter: ctx.getText() });
+      return SqlParserVisitor.prototype.visitChildren.call(this, ctx);
+    } catch (e: unknown) {
+      throw this.errorWithContext(e as any, ctx);
+    }
   }
 
   // Visit a parse tree produced by SqlParser#sqlStatement.
@@ -223,7 +258,10 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     // Join and ensure we can get the same result back...
     const text = values.join(DOTTED_ID_CHAR);
     if (values.length !== text.split(DOTTED_ID_SPLIT).length) {
-      throw new Error(`Invalid identifier: ${text}`);
+      throw this.errorWithContext(
+        new Error(`Invalid identifier: ${text}`),
+        ctx
+      );
     }
     return text;
   }
@@ -243,7 +281,10 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     // Join and ensure we can get the same result back...
     const text = values.join(DOTTED_ID_CHAR);
     if (values.length !== text.split(DOTTED_ID_SPLIT).length) {
-      throw new Error(`Invalid identifier: ${text}`);
+      throw this.errorWithContext(
+        new Error(`Invalid identifier: ${text}`),
+        ctx
+      );
     }
     return text;
   }
@@ -363,13 +404,16 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     const text = ctx.getText();
     let valueNum: number | undefined;
     if (text[0] === "x" || text[0] === "X") {
-      valueNum = parseInt(text.substring(2, text.length - 3), 16);
+      valueNum = parseInt(text.substring(2, text.length - 1), 16);
     } else if (text[0] === "0" && (text[1] === "x" || text[1] === "X")) {
       valueNum = parseInt(text.substring(2), 16);
     }
 
     if (!valueNum || !Number.isFinite(valueNum)) {
-      throw new Error(`Invalid hexadecimal literal: ${text}`);
+      throw this.errorWithContext(
+        new Error(`Invalid hexadecimal literal: ${text}`),
+        ctx
+      );
     }
 
     const value: SqlValue = {
