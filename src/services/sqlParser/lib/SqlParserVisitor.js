@@ -258,6 +258,12 @@ SqlParserVisitor.prototype.visitConstantsOrDefaults = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#whereExpression.
+SqlParserVisitor.prototype.visitWhereExpression = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#notExpression.
 SqlParserVisitor.prototype.visitNotExpression = function(ctx) {
   return this.visitChildren(ctx);

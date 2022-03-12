@@ -114,12 +114,36 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     this.output.push(result);
   }
 
+  private unpackStatement(
+    table?: ParserRuleContext,
+    whereExp?: ParserRuleContext,
+    orderBy?: ParserRuleContext,
+    limit?: ParserRuleContext
+  ) {
+    const statement: SqlStatement = {};
+    if (table) {
+      statement.table = [this.visitTableSource(table)];
+    }
+    if (whereExp) {
+      statement.where = this.visitWhereExpression(whereExp);
+    }
+    if (orderBy) {
+      statement.orderBy = this.visitOrderByClause(orderBy).orderBy;
+    }
+    if (limit) {
+      const limits = this.visitLimitClause(limit);
+      statement.limit = limits.limit;
+      statement.offset = limits.offset;
+    }
+    return statement;
+  }
+
   // Visit a parse tree produced by SqlParser#deleteStatement.
   override visitDeleteStatement(ctx: ParserRuleContext) {
     const statement: SqlStatement = {
       type: "delete",
+      ...this.unpackStatement(ctx.table, ctx.whereExp, ctx.order, ctx.limit),
     };
-    Object.assign(statement, ...this.visitChildren(ctx));
     return statement;
   }
 
@@ -136,8 +160,18 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   override visitUpdateStatement(ctx: ParserRuleContext) {
     const statement: SqlStatement = {
       type: "update",
+      ...this.unpackStatement(ctx.table, ctx.whereExp, ctx.order, ctx.limit),
     };
-    Object.assign(statement, ...this.visitChildren(ctx));
+    const columns: SqlColumn[] = [];
+    const values: SqlValue[] = [];
+
+    const updates = this.visitChildren(ctx).filter((o: any) => !!o?.set);
+    updates.forEach(({ set, value }: any) => {
+      columns.push(set);
+      values.push(value);
+    });
+    statement.columns = columns;
+    statement.values = [values];
     return statement;
   }
 
@@ -147,7 +181,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       type: "insert",
     };
     if (ctx.table) {
-      statement.table = this.visitTableName(ctx.table);
+      statement.table = [{ name: this.visitTableName(ctx.table) }];
     }
     if (ctx.columns) {
       statement.columns = this.visitFullColumnNameList(ctx.columns);
@@ -519,6 +553,11 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#constants.
   override visitConstants(ctx: ParserRuleContext) {
     return this.visitChildren(ctx);
+  }
+
+  override visitWhereExpression(ctx: ParserRuleContext) {
+    const [expr] = this.visitChildren(ctx);
+    return expr;
   }
 
   // Visit a parse tree produced by SqlParser#notExpression.

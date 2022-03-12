@@ -68,9 +68,9 @@ insertStatementValue
 
 updateStatement
     : UPDATE 
-      tableName (AS? alias=uid)?
+      table=tableSource
       SET updatedElement (',' updatedElement)*
-      (WHERE whereExp=expression)? orderByClause? limitClause?
+      (WHERE whereExp=whereExpression)? order=orderByClause? limit=limitClause?
     ;
 
 updatedElement
@@ -81,9 +81,8 @@ updatedElement
 
 deleteStatement
     : DELETE
-    FROM tableName
-      (WHERE whereExp=expression)?
-      orderByClause? (LIMIT limit=decimalLiteral)?
+      FROM table=tableSource
+      (WHERE whereExp=whereExpression)? order=orderByClause? limit=limitClause?
     ;
 
 /** SELECT */
@@ -106,7 +105,7 @@ selectElement
 /** SHARED */
 
 fromClause
-    : FROM tableSource (WHERE whereExp=expression)?
+    : FROM tableSource (WHERE whereExp=whereExpression)?
     ;
 
 orderByClause
@@ -238,6 +237,10 @@ constants
 
 constantsOrDefaults
     : constantOrDefault (',' constantOrDefault)*
+    ;
+
+whereExpression
+    : expression
     ;
 
 expression
