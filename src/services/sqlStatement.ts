@@ -26,7 +26,14 @@ export interface SqlOrder extends IHaveName {
 }
 
 export interface SqlValue {
-  type: "column" | "string" | "number" | "hexadecimal" | "boolean" | "null";
+  type:
+    | "column"
+    | "string"
+    | "number"
+    | "hexadecimal"
+    | "boolean"
+    | "null"
+    | "default";
   value: string;
   valueNum?: number;
   valueBool?: boolean;
@@ -49,6 +56,7 @@ export interface SqlStatement {
   type?: "select" | "insert" | "update" | "delete";
   table?: SqlTable[];
   columns?: SqlColumn[];
+  values?: SqlValue[][];
   orderBy?: SqlOrder[];
   where?: string;
   limit?: number;

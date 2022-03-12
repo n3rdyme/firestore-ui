@@ -146,18 +146,71 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     const statement: SqlStatement = {
       type: "insert",
     };
-    Object.assign(statement, ...this.visitChildren(ctx));
+    if (ctx.table) {
+      statement.table = this.visitTableName(ctx.table);
+    }
+    if (ctx.columns) {
+      statement.columns = this.visitFullColumnNameList(ctx.columns);
+    }
+
+    // Object.assign(statement, ...this.visitChildren(ctx));
+    if (ctx.values) {
+      Object.assign(statement, this.visitInsertStatementValues(ctx.values));
+    } else if (ctx.valueSet) {
+      Object.assign(
+        statement,
+        this.visitInsertStatementSetValues(ctx.valueSet)
+      );
+    }
+
+    return statement;
+  }
+
+  // Visit a parse tree produced by SqlParser#insertStatementSetValues.
+  override visitInsertStatementSetValues(ctx: ParserRuleContext) {
+    const columns: SqlColumn[] = [];
+    const values: SqlValue[] = [];
+
+    const updates = this.visitChildren(ctx).filter((o: any) => !!o?.set);
+    updates.forEach(({ set, value }: any) => {
+      columns.push(set);
+      values.push(value);
+    });
+    const statement: SqlStatement = {
+      columns,
+      values: [values],
+    };
+    return statement;
+  }
+
+  // Visit a parse tree produced by SqlParser#insertStatementValues.
+  override visitInsertStatementValues(ctx: ParserRuleContext) {
+    const statement: SqlStatement = {};
+    if (ctx.columns) {
+      statement.columns = this.visitFullColumnNameList(ctx.columns);
+    }
+    if (ctx.values) {
+      statement.values = this.visitInsertStatementValue(ctx.values).filter(
+        (o: any) => !!o
+      );
+    }
+
     return statement;
   }
 
   // Visit a parse tree produced by SqlParser#insertStatementValue.
   override visitInsertStatementValue(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    return this.visitChildren(ctx).filter((data: any) => Array.isArray(data));
   }
 
   // Visit a parse tree produced by SqlParser#updatedElement.
   override visitUpdatedElement(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [column, , value] = this.visitChildren(ctx);
+    const set = { type: "column", value: column };
+    if (ctx.isDefault) {
+      return { set, value: { type: "default", value: "default" } };
+    }
+    return { set, value };
   }
 
   // Visit a parse tree produced by SqlParser#orderByClause.
@@ -433,15 +486,34 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     return value;
   }
 
+  override visitConstantsOrDefaults(ctx: ParserRuleContext) {
+    return this.visitChildren(ctx).filter((o: any) => !!o?.type);
+  }
+
+  override visitConstantOrDefault(ctx: ParserRuleContext) {
+    if (ctx.isDefault) {
+      const defValue: SqlValue = { type: "default", value: ctx.getText() };
+      return defValue;
+    }
+    const [value] = this.visitChildren(ctx);
+    return value;
+  }
+
   // Visit a parse tree produced by SqlParser#constant.
   override visitConstant(ctx: ParserRuleContext) {
     const [datum] = this.visitChildren(ctx);
     return datum;
   }
 
-  // Visit a parse tree produced by SqlParser#uidList.
-  override visitUidList(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+  // Visit a parse tree produced by SqlParser#fullColumnNameList.
+  override visitFullColumnNameList(ctx: ParserRuleContext) {
+    const columnNames: string[] = this.visitChildren(ctx).filter(
+      (o: any) => !!o
+    ) as any;
+    return columnNames.map<SqlColumn>((name) => ({
+      type: "column",
+      value: name,
+    }));
   }
 
   // Visit a parse tree produced by SqlParser#constants.

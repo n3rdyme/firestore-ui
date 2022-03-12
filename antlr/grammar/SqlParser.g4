@@ -47,20 +47,21 @@ sqlStatement
 
 insertStatement
     : INSERT
-      INTO? tableName
-      (
-        ('(' columns=uidList ')')? insertStatementValue
-        | SET
-            setFirst=updatedElement
-            (',' setElements+=updatedElement)*
-      )
+      INTO? table=tableName
+      (valueSet=insertStatementSetValues | values=insertStatementValues)
+    ;
+    
+insertStatementSetValues
+    : SET updatedElement (',' updatedElement)*
+    ;
+
+insertStatementValues
+    : ('(' columns=fullColumnNameList ')')? values=insertStatementValue
     ;
 
 insertStatementValue
-    : 
-    insertFormat=(VALUES | VALUE)
-      '(' constantsOrDefaults ')'
-        (',' '(' constantsOrDefaults ')')*
+    : (VALUES | VALUE)
+      '(' constantsOrDefaults ')' (',' '(' constantsOrDefaults ')')*
     ;
 
 /** UPDATE */
@@ -73,7 +74,7 @@ updateStatement
     ;
 
 updatedElement
-    : fullColumnName '=' (constOrColumnAtom | DEFAULT)
+    : fullColumnName '=' (constOrColumnAtom | isDefault=DEFAULT)
     ;
 
 /** DELETE */
@@ -224,11 +225,11 @@ constant
     ;
 
 constantOrDefault
-    : constant | DEFAULT
+    : constant | isDefault=DEFAULT
     ;
     
-uidList
-    : uid (',' uid)*
+fullColumnNameList
+    : fullColumnName (',' fullColumnName)*
     ;
 
 constants

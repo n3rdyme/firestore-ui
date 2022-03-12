@@ -42,6 +42,18 @@ SqlParserVisitor.prototype.visitInsertStatement = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#insertStatementSetValues.
+SqlParserVisitor.prototype.visitInsertStatementSetValues = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#insertStatementValues.
+SqlParserVisitor.prototype.visitInsertStatementValues = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#insertStatementValue.
 SqlParserVisitor.prototype.visitInsertStatementValue = function(ctx) {
   return this.visitChildren(ctx);
@@ -228,8 +240,8 @@ SqlParserVisitor.prototype.visitConstantOrDefault = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#uidList.
-SqlParserVisitor.prototype.visitUidList = function(ctx) {
+// Visit a parse tree produced by SqlParser#fullColumnNameList.
+SqlParserVisitor.prototype.visitFullColumnNameList = function(ctx) {
   return this.visitChildren(ctx);
 };
 
