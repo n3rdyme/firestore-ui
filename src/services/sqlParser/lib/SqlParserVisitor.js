@@ -114,12 +114,6 @@ SqlParserVisitor.prototype.visitLimitClause = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#limitClauseAtom.
-SqlParserVisitor.prototype.visitLimitClauseAtom = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by SqlParser#fullId.
 SqlParserVisitor.prototype.visitFullId = function(ctx) {
   return this.visitChildren(ctx);
@@ -150,8 +144,32 @@ SqlParserVisitor.prototype.visitUid = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#doubleQuoteId.
+SqlParserVisitor.prototype.visitDoubleQuoteId = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#reverseQuoteId.
+SqlParserVisitor.prototype.visitReverseQuoteId = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#blockedQuoteId.
+SqlParserVisitor.prototype.visitBlockedQuoteId = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#simpleId.
 SqlParserVisitor.prototype.visitSimpleId = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#dotLiteral.
+SqlParserVisitor.prototype.visitDotLiteral = function(ctx) {
   return this.visitChildren(ctx);
 };
 

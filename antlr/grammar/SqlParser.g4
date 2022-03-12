@@ -82,7 +82,7 @@ deleteStatement
     : DELETE
     FROM tableName
       (WHERE whereExp=expression)?
-      orderByClause? (LIMIT limitClauseAtom)?
+      orderByClause? (LIMIT limit=decimalLiteral)?
     ;
 
 /** SELECT */
@@ -123,17 +123,13 @@ tableSource
 limitClause
     : LIMIT
     (
-      (offset=limitClauseAtom ',')? limit=limitClauseAtom
-      | limit=limitClauseAtom OFFSET offset=limitClauseAtom
+      (offset=decimalLiteral ',')? limit=decimalLiteral
+      | limit=decimalLiteral OFFSET offset=decimalLiteral
     )
     ;
 
-limitClauseAtom
-	: decimalLiteral
-	;
-
 fullId
-    : uid (DOT_ID | '.' uid)?
+    : uid (dotLiteral | '.' uid)*
     ;
 
 tableName
@@ -154,10 +150,22 @@ engineName
 
 uid
     : simpleId
-    | DOUBLE_QUOTE_ID
-    | REVERSE_QUOTE_ID
-    | BLOCKED_QUOTE_ID
+    | doubleQuoteId
+    | reverseQuoteId
+    | blockedQuoteId
     // | CHARSET_REVERSE_QOUTE_STRING
+    ;
+
+doubleQuoteId
+    : DOUBLE_QUOTE_ID
+    ;
+    
+reverseQuoteId
+    : REVERSE_QUOTE_ID
+    ;
+    
+blockedQuoteId
+    : BLOCKED_QUOTE_ID
     ;
 
 simpleId
@@ -172,8 +180,12 @@ simpleId
     | functionNameBase
     ;
 
-dottedId
+dotLiteral
     : DOT_ID
+    ;
+
+dottedId
+    : dotLiteral
     | '.' uid
     ;
 

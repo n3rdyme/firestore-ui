@@ -28,6 +28,8 @@ export interface SqlOrder extends IHaveName {
 export interface SqlValue {
   type: "column" | "string" | "number" | "hexadecimal" | "boolean" | "null";
   value: string;
+  valueNum?: number;
+  valueBool?: boolean;
 }
 
 export interface SqlCondition {

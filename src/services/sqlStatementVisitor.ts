@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 /*
  * ****************************************************************************
  * Copyright (C) 2022-2022 - All rights reserved.
@@ -17,6 +18,10 @@ import {
   SqlTable,
   SqlValue,
 } from "./sqlStatement";
+
+// using this character to separate the names in multi-part names
+export const DOTTED_ID_CHAR = `\u0000`;
+export const DOTTED_ID_SPLIT = new RegExp(DOTTED_ID_CHAR, "g");
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
@@ -130,7 +135,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#orderByExpression.
   override visitOrderByExpression(ctx: ParserRuleContext) {
     const order: SqlOrder = {
-      name: ctx.orderOn.getText(),
+      name: this.visitFullColumnName(ctx.orderOn),
     };
     order.order = ctx.orderBy?.type === SqlParser.DESC ? "desc" : "asc";
     return order;
@@ -153,21 +158,23 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#selectElement.
   override visitSelectElement(ctx: ParserRuleContext) {
-    const colData = ctx.starOf ?? ctx.column ?? ctx.value;
     const col: SqlColumn = {
       type: "column",
-      value: colData.getText(),
+      value: "",
     };
 
     if (ctx.starOf) {
-      col.value = ctx.getText();
       col.star = true;
+      col.value = this.visitFullId(ctx.starOf);
+    } else if (ctx.column) {
+      col.value = this.visitFullColumnName(ctx.column);
+    } else if (ctx.value) {
+      const [value] = this.visitChildren(ctx);
+      Object.assign(col, value);
     }
+
     if (ctx.alias) {
-      col.alias = ctx.alias.getText();
-    }
-    if (ctx.value) {
-      Object.assign(col, ...this.visitChildren(ctx));
+      col.alias = this.visitUid(ctx.alias);
     }
 
     return col;
@@ -179,7 +186,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       name: tableName,
     };
     if (ctx.alias) {
-      tableSource.alias = ctx.alias.getText();
+      tableSource.alias = this.visitUid(ctx.alias);
     }
 
     return tableSource;
@@ -198,10 +205,10 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   override visitLimitClause(ctx: ParserRuleContext) {
     const statement: SqlStatement = {};
     if (ctx.limit) {
-      statement.limit = parseInt(ctx.limit.getText(), 10);
+      statement.limit = this.visitDecimalLiteral(ctx.limit).valueNum;
     }
     if (ctx.offset) {
-      statement.offset = parseInt(ctx.offset.getText(), 10);
+      statement.offset = this.visitDecimalLiteral(ctx.offset).valueNum;
     }
 
     return statement;
@@ -209,32 +216,106 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#fullId.
   override visitFullId(ctx: ParserRuleContext) {
-    return ctx.getText();
+    const values = this.visitChildren(ctx).filter((o: any) => !!o);
+    if (values.length === 1) {
+      return values[0];
+    }
+    // Join and ensure we can get the same result back...
+    const text = values.join(DOTTED_ID_CHAR);
+    if (values.length !== text.split(DOTTED_ID_SPLIT).length) {
+      throw new Error(`Invalid identifier: ${text}`);
+    }
+    return text;
   }
 
   // Visit a parse tree produced by SqlParser#tableName.
   override visitTableName(ctx: ParserRuleContext) {
-    return ctx.getText();
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#fullColumnName.
   override visitFullColumnName(ctx: ParserRuleContext) {
-    return ctx.getText();
+    const values = this.visitChildren(ctx).filter((o: any) => !!o);
+    if (values.length === 1) {
+      return values[0];
+    }
+    // Join and ensure we can get the same result back...
+    const text = values.join(DOTTED_ID_CHAR);
+    if (values.length !== text.split(DOTTED_ID_SPLIT).length) {
+      throw new Error(`Invalid identifier: ${text}`);
+    }
+    return text;
   }
 
   // Visit a parse tree produced by SqlParser#uid.
   override visitUid(ctx: ParserRuleContext) {
-    return ctx.getText();
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#simpleId.
   override visitSimpleId(ctx: ParserRuleContext) {
-    return ctx.getText();
+    return ctx.getText(); // plain text
+  }
+
+  private unescapeChar(char: string) {
+    switch (char) {
+      case "n":
+        return "\n";
+      case "r":
+        return "\r";
+      case "t":
+        return "\t";
+      case "b":
+        return "\b";
+      case "f":
+        return "\f";
+      case "\\":
+        return "\\";
+      default:
+        return char;
+    }
+  }
+
+  // Visit a parse tree produced by SqlParser#doubleQuoteId
+  override visitDoubleQuoteId(ctx: ParserRuleContext) {
+    const text = ctx.getText();
+    return text.substring(1, text.length - 1).replace(/(""|\\.)/g, (txt) => {
+      if (txt === '""') {
+        return '"';
+      }
+      return this.unescapeChar(txt[1]);
+    });
+  }
+
+  // Visit a parse tree produced by SqlParser#reverseQuoteId
+  override visitReverseQuoteId(ctx: ParserRuleContext) {
+    const text = ctx.getText();
+    return text.substring(1, text.length - 1).replace(/(``|\\.)/g, (txt) => {
+      if (txt === "``") {
+        return "`";
+      }
+      return this.unescapeChar(txt[1]);
+    });
+  }
+
+  // Visit a parse tree produced by SqlParser#blockedQuoteId
+  override visitBlockedQuoteId(ctx: ParserRuleContext) {
+    const text = ctx.getText();
+    return text.substring(1, text.length - 1);
   }
 
   // Visit a parse tree produced by SqlParser#dottedId.
   override visitDottedId(ctx: ParserRuleContext) {
-    return ctx.getText();
+    const [idOrToken, id2] = this.visitChildren(ctx).filter((o: any) => !!o);
+    // Token '.' would be undefined, so use the second argument
+    return idOrToken ?? id2;
+  }
+
+  // Visit a parse tree produced by SqlParser#dotLiteral.
+  override visitDotLiteral(ctx: ParserRuleContext) {
+    return ctx.getText().substring(1);
   }
 
   // Visit a parse tree produced by SqlParser#decimalLiteral.
@@ -242,6 +323,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     const value: SqlValue = {
       type: "number",
       value: ctx.getText(),
+      valueNum: parseInt(ctx.getText(), 10),
     };
     return value;
   }
@@ -251,6 +333,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     const value: SqlValue = {
       type: "number",
       value: ctx.getText(),
+      valueNum: parseInt(ctx.getText(), 10),
     };
     return value;
   }
@@ -266,18 +349,33 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#booleanLiteral.
   override visitBooleanLiteral(ctx: ParserRuleContext) {
+    const text = ctx.getText();
     const value: SqlValue = {
       type: "boolean",
-      value: ctx.getText(),
+      value: text,
+      valueBool: text[0] !== "f" && text[0] !== "F" && text[0] !== "0",
     };
     return value;
   }
 
   // Visit a parse tree produced by SqlParser#hexadecimalLiteral.
   override visitHexadecimalLiteral(ctx: ParserRuleContext) {
+    const text = ctx.getText();
+    let valueNum: number | undefined;
+    if (text[0] === "x" || text[0] === "X") {
+      valueNum = parseInt(text.substring(2, text.length - 3), 16);
+    } else if (text[0] === "0" && (text[1] === "x" || text[1] === "X")) {
+      valueNum = parseInt(text.substring(2), 16);
+    }
+
+    if (!valueNum || !Number.isFinite(valueNum)) {
+      throw new Error(`Invalid hexadecimal literal: ${text}`);
+    }
+
     const value: SqlValue = {
       type: "hexadecimal",
-      value: ctx.getText(),
+      value: text,
+      valueNum,
     };
     return value;
   }
