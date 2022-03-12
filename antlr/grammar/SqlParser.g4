@@ -93,8 +93,7 @@ selectStatement
     ;
 
 selectElements
-    : (star='*')
-    | selectElement (',' selectElement)* (',' star='*')?
+    : (star='*') | selectElement (',' selectElement)* (',' star='*')?
     ;
 
 selectElement

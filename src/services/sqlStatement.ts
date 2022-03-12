@@ -15,11 +15,9 @@ export interface SqlTable extends IHaveName {
   alias?: string;
 }
 
-export interface SqlColumn extends IHaveName {
-  name: string;
+export interface SqlColumn extends SqlValue {
   alias?: string;
   star?: boolean;
-  value?: SqlValue;
 }
 
 export interface SqlOrder extends IHaveName {

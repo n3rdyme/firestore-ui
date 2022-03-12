@@ -14,6 +14,7 @@ import {
   SqlExpression,
   SqlOrder,
   SqlStatement,
+  SqlTable,
   SqlValue,
 } from "./sqlStatement";
 
@@ -24,15 +25,10 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   private readonly statements: SqlStatement[];
 
-  private current: SqlStatement;
-
-  private currentValue?: SqlValue;
-
   constructor(statements: any[]) {
     super();
     this.output = statements;
     this.statements = [];
-    this.current = undefined as any;
   }
 
   static parseSql(sql: string) {
@@ -74,40 +70,44 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#sqlStatement.
   override visitSqlStatement(ctx: ParserRuleContext) {
-    this.current = {};
-    this.statements.push(this.current);
-    try {
-      const result = this.visitChildren(ctx);
-      this.output.push(this.current);
-      return result;
-    } finally {
-      this.statements.pop();
-      this.current = this.statements[this.statements.length - 1];
-    }
+    const [result] = this.visitChildren(ctx);
+    this.output.push(result);
   }
 
   // Visit a parse tree produced by SqlParser#deleteStatement.
   override visitDeleteStatement(ctx: ParserRuleContext) {
-    this.current.type = "delete";
-    return this.visitChildren(ctx);
+    const statement: SqlStatement = {
+      type: "delete",
+    };
+    Object.assign(statement, ...this.visitChildren(ctx));
+    return statement;
   }
 
   // Visit a parse tree produced by SqlParser#selectStatement.
   override visitSelectStatement(ctx: ParserRuleContext) {
-    this.current.type = "select";
-    return this.visitChildren(ctx);
+    const statement: SqlStatement = {
+      type: "select",
+    };
+    Object.assign(statement, ...this.visitChildren(ctx));
+    return statement;
   }
 
   // Visit a parse tree produced by SqlParser#updateStatement.
   override visitUpdateStatement(ctx: ParserRuleContext) {
-    this.current.type = "update";
-    return this.visitChildren(ctx);
+    const statement: SqlStatement = {
+      type: "update",
+    };
+    Object.assign(statement, ...this.visitChildren(ctx));
+    return statement;
   }
 
   // Visit a parse tree produced by SqlParser#insertStatement.
   override visitInsertStatement(ctx: ParserRuleContext) {
-    this.current.type = "insert";
-    return this.visitChildren(ctx);
+    const statement: SqlStatement = {
+      type: "insert",
+    };
+    Object.assign(statement, ...this.visitChildren(ctx));
+    return statement;
   }
 
   // Visit a parse tree produced by SqlParser#insertStatementValue.
@@ -122,80 +122,89 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#orderByClause.
   override visitOrderByClause(ctx: ParserRuleContext) {
-    this.current.orderBy = [];
-    return this.visitChildren(ctx);
+    return {
+      orderBy: this.visitChildren(ctx).filter((o: any) => !!o),
+    };
   }
 
   // Visit a parse tree produced by SqlParser#orderByExpression.
   override visitOrderByExpression(ctx: ParserRuleContext) {
-    if (ctx.orderOn) {
-      const order: SqlOrder = {
-        name: ctx.orderOn.getText(),
-      };
-      order.order = ctx.orderBy?.type === SqlParser.DESC ? "desc" : "asc";
-      this.current.orderBy?.push(order);
-    }
-    // this.current.orderBy.push(order);
-    return this.visitChildren(ctx);
+    const order: SqlOrder = {
+      name: ctx.orderOn.getText(),
+    };
+    order.order = ctx.orderBy?.type === SqlParser.DESC ? "desc" : "asc";
+    return order;
   }
 
   // Visit a parse tree produced by SqlParser#selectElements.
   override visitSelectElements(ctx: ParserRuleContext) {
-    this.current.columns = [];
-    const result = this.visitChildren(ctx);
-    if (ctx.star && !this.current.columns.find((c) => c.name === "*")) {
-      this.current.columns.push({ name: "*" });
+    const columns: SqlColumn[] = this.visitChildren(ctx).filter(
+      (o: any) => !!o
+    );
+    if (ctx.star && !columns.find((c) => c.value === "*")) {
+      columns.push({ type: "column", value: "*", star: true });
     }
-    return result;
+
+    const statement: SqlStatement = {
+      columns,
+    };
+    return statement;
   }
 
-  // Visit a parse tree produced by SqlParser#selectStarElement.
+  // Visit a parse tree produced by SqlParser#selectElement.
   override visitSelectElement(ctx: ParserRuleContext) {
-    const oldCurrValue = this.currentValue;
     const colData = ctx.starOf ?? ctx.column ?? ctx.value;
-    if (colData) {
-      const col: SqlColumn = { name: colData.getText() };
-      if (ctx.starOf) {
-        col.name = ctx.getText();
-        col.star = true;
-      }
-      if (ctx.alias) {
-        col.alias = ctx.alias.getText();
-      }
-      if (ctx.value) {
-        col.value = {
-          type: "string",
-          value: ctx.value.getText(),
-        };
-        this.currentValue = col.value;
-      }
+    const col: SqlColumn = {
+      type: "column",
+      value: colData.getText(),
+    };
 
-      this.current.columns?.push(col);
+    if (ctx.starOf) {
+      col.value = ctx.getText();
+      col.star = true;
+    }
+    if (ctx.alias) {
+      col.alias = ctx.alias.getText();
+    }
+    if (ctx.value) {
+      Object.assign(col, ...this.visitChildren(ctx));
     }
 
-    const result = this.visitChildren(ctx);
-    this.currentValue = oldCurrValue;
-    return result;
+    return col;
+  }
+
+  override visitTableSource(ctx: ParserRuleContext) {
+    const [tableName] = this.visitChildren(ctx);
+    const tableSource: SqlTable = {
+      name: tableName,
+    };
+    if (ctx.alias) {
+      tableSource.alias = ctx.alias.getText();
+    }
+
+    return tableSource;
   }
 
   // Visit a parse tree produced by SqlParser#fromClause.
   override visitFromClause(ctx: ParserRuleContext) {
     const [, from, , where] = this.visitChildren(ctx);
-    if (where) {
-      this.current.where = where;
-    }
+    return {
+      from: Array.isArray(from) ? from : [from],
+      where,
+    };
   }
 
   // Visit a parse tree produced by SqlParser#limitClause.
   override visitLimitClause(ctx: ParserRuleContext) {
-    if (ctx.limit && this.current) {
-      this.current.limit = parseInt(ctx.limit.getText(), 10);
+    const statement: SqlStatement = {};
+    if (ctx.limit) {
+      statement.limit = parseInt(ctx.limit.getText(), 10);
     }
-    if (ctx.offset && this.current) {
-      this.current.offset = parseInt(ctx.offset.getText(), 10);
+    if (ctx.offset) {
+      statement.offset = parseInt(ctx.offset.getText(), 10);
     }
 
-    return this.visitChildren(ctx);
+    return statement;
   }
 
   // Visit a parse tree produced by SqlParser#fullId.
