@@ -369,12 +369,12 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     return value;
   }
 
-  // Visit a parse tree produced by SqlParser#decimalLiteral.
+  // Visit a parse tree produced by SqlParser#constNumberLiteral.
   override visitConstNumberLiteral(ctx: ParserRuleContext) {
     const value: SqlValue = {
       type: "number",
       value: ctx.getText(),
-      valueNum: parseInt(ctx.getText(), 10),
+      valueNum: parseFloat(ctx.getText()),
     };
     return value;
   }
