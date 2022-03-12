@@ -258,8 +258,8 @@ SqlParserVisitor.prototype.visitIsNullPredicate = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#binaryComparasionPredicate.
-SqlParserVisitor.prototype.visitBinaryComparasionPredicate = function(ctx) {
+// Visit a parse tree produced by SqlParser#binaryComparisonPredicate.
+SqlParserVisitor.prototype.visitBinaryComparisonPredicate = function(ctx) {
   return this.visitChildren(ctx);
 };
 

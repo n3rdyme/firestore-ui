@@ -306,25 +306,25 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0003\u0002\u0002\u0002\u01a5\u01a8\u0003\u0002\u0002\u0002\u01a6\u01a4",
     "\u0003\u0002\u0002\u0002\u01a6\u01a7\u0003\u0002\u0002\u0002\u01a7K",
     "\u0003\u0002\u0002\u0002\u01a8\u01a6\u0003\u0002\u0002\u0002\u01a9\u01ab",
-    "\u0005R*\u0002\u01aa\u01ac\u0007h\u0002\u0002\u01ab\u01aa\u0003\u0002",
+    "\u0005P)\u0002\u01aa\u01ac\u0007h\u0002\u0002\u01ab\u01aa\u0003\u0002",
     "\u0002\u0002\u01ab\u01ac\u0003\u0002\u0002\u0002\u01ac\u01ad\u0003\u0002",
     "\u0002\u0002\u01ad\u01ae\u0007I\u0002\u0002\u01ae\u01af\u0007\u03fe",
     "\u0002\u0002\u01af\u01b0\u0005N(\u0002\u01b0\u01b1\u0007\u03ff\u0002",
-    "\u0002\u01b1\u01d6\u0003\u0002\u0002\u0002\u01b2\u01b3\u0005R*\u0002",
+    "\u0002\u01b1\u01d6\u0003\u0002\u0002\u0002\u01b2\u01b3\u0005P)\u0002",
     "\u01b3\u01b5\u0007Q\u0002\u0002\u01b4\u01b6\u0007h\u0002\u0002\u01b5",
     "\u01b4\u0003\u0002\u0002\u0002\u01b5\u01b6\u0003\u0002\u0002\u0002\u01b6",
     "\u01b7\u0003\u0002\u0002\u0002\u01b7\u01b8\u0005> \u0002\u01b8\u01d6",
-    "\u0003\u0002\u0002\u0002\u01b9\u01ba\u0005R*\u0002\u01ba\u01bb\u0005",
-    "T+\u0002\u01bb\u01bc\u0005R*\u0002\u01bc\u01d6\u0003\u0002\u0002\u0002",
-    "\u01bd\u01bf\u0005R*\u0002\u01be\u01c0\u0007h\u0002\u0002\u01bf\u01be",
+    "\u0003\u0002\u0002\u0002\u01b9\u01ba\u0005P)\u0002\u01ba\u01bb\u0005",
+    "T+\u0002\u01bb\u01bc\u0005P)\u0002\u01bc\u01d6\u0003\u0002\u0002\u0002",
+    "\u01bd\u01bf\u0005P)\u0002\u01be\u01c0\u0007h\u0002\u0002\u01bf\u01be",
     "\u0003\u0002\u0002\u0002\u01bf\u01c0\u0003\u0002\u0002\u0002\u01c0\u01c1",
     "\u0003\u0002\u0002\u0002\u01c1\u01c2\u0007\u0010\u0002\u0002\u01c2\u01c3",
-    "\u0005R*\u0002\u01c3\u01c4\u0007\f\u0002\u0002\u01c4\u01c5\u0005R*\u0002",
-    "\u01c5\u01d6\u0003\u0002\u0002\u0002\u01c6\u01c8\u0005R*\u0002\u01c7",
+    "\u0005@!\u0002\u01c3\u01c4\u0007\f\u0002\u0002\u01c4\u01c5\u0005@!\u0002",
+    "\u01c5\u01d6\u0003\u0002\u0002\u0002\u01c6\u01c8\u0005P)\u0002\u01c7",
     "\u01c9\u0007h\u0002\u0002\u01c8\u01c7\u0003\u0002\u0002\u0002\u01c8",
     "\u01c9\u0003\u0002\u0002\u0002\u01c9\u01ca\u0003\u0002\u0002\u0002\u01ca",
     "\u01cb\u0007Z\u0002\u0002\u01cb\u01cc\u0007\u040d\u0002\u0002\u01cc",
-    "\u01d6\u0003\u0002\u0002\u0002\u01cd\u01cf\u0005R*\u0002\u01ce\u01d0",
+    "\u01d6\u0003\u0002\u0002\u0002\u01cd\u01cf\u0005P)\u0002\u01ce\u01d0",
     "\u0007h\u0002\u0002\u01cf\u01ce\u0003\u0002\u0002\u0002\u01cf\u01d0",
     "\u0003\u0002\u0002\u0002\u01d0\u01d1\u0003\u0002\u0002\u0002\u01d1\u01d2",
     "\t\t\u0002\u0002\u01d2\u01d3\u0007\u040d\u0002\u0002\u01d3\u01d6\u0003",
@@ -7771,7 +7771,7 @@ ExpressionContext.prototype.copyFrom = function(ctx) {
 
 function NotExpressionContext(parser, ctx) {
 	ExpressionContext.call(this, parser);
-    this.notOperator = null; // Token;
+    this.not = null; // Token;
     ExpressionContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -7883,10 +7883,10 @@ SqlParser.prototype.expression = function(_p) {
             _prevctx = localctx;
 
             this.state = 409;
-            localctx.notOperator = this._input.LT(1);
+            localctx.not = this._input.LT(1);
             _la = this._input.LA(1);
             if(!(_la===SqlParser.NOT || _la===SqlParser.EXCLAMATION_SYMBOL)) {
-                localctx.notOperator = this._errHandler.recoverInline(this);
+                localctx.not = this._errHandler.recoverInline(this);
             }
             else {
             	this._errHandler.reportMatch(this);
@@ -7992,8 +7992,48 @@ ExpressionAtomPredicateContext.prototype.accept = function(visitor) {
 };
 
 
+function BinaryComparisonPredicateContext(parser, ctx) {
+	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.op = null; // ComparisonOperatorContext;
+    this.right = null; // ConstOrColumnAtomContext;
+    PredicateContext.prototype.copyFrom.call(this, ctx);
+    return this;
+}
+
+BinaryComparisonPredicateContext.prototype = Object.create(PredicateContext.prototype);
+BinaryComparisonPredicateContext.prototype.constructor = BinaryComparisonPredicateContext;
+
+SqlParser.BinaryComparisonPredicateContext = BinaryComparisonPredicateContext;
+
+BinaryComparisonPredicateContext.prototype.constOrColumnAtom = function(i) {
+    if(i===undefined) {
+        i = null;
+    }
+    if(i===null) {
+        return this.getTypedRuleContexts(ConstOrColumnAtomContext);
+    } else {
+        return this.getTypedRuleContext(ConstOrColumnAtomContext,i);
+    }
+};
+
+BinaryComparisonPredicateContext.prototype.comparisonOperator = function() {
+    return this.getTypedRuleContext(ComparisonOperatorContext,0);
+};
+BinaryComparisonPredicateContext.prototype.accept = function(visitor) {
+    if ( visitor instanceof SqlParserVisitor ) {
+        return visitor.visitBinaryComparisonPredicate(this);
+    } else {
+        return visitor.visitChildren(this);
+    }
+};
+
+
 function InPredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.not = null; // Token;
+    this.values = null; // ConstantAtomsContext;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -8002,10 +8042,6 @@ InPredicateContext.prototype = Object.create(PredicateContext.prototype);
 InPredicateContext.prototype.constructor = InPredicateContext;
 
 SqlParser.InPredicateContext = InPredicateContext;
-
-InPredicateContext.prototype.expressionAtom = function() {
-    return this.getTypedRuleContext(ExpressionAtomContext,0);
-};
 
 InPredicateContext.prototype.IN = function() {
     return this.getToken(SqlParser.IN, 0);
@@ -8017,6 +8053,10 @@ InPredicateContext.prototype.LR_BRACKET = function() {
 
 InPredicateContext.prototype.RR_BRACKET = function() {
     return this.getToken(SqlParser.RR_BRACKET, 0);
+};
+
+InPredicateContext.prototype.constOrColumnAtom = function() {
+    return this.getTypedRuleContext(ConstOrColumnAtomContext,0);
 };
 
 InPredicateContext.prototype.constantAtoms = function() {
@@ -8037,6 +8077,10 @@ InPredicateContext.prototype.accept = function(visitor) {
 
 function BetweenPredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.not = null; // Token;
+    this.min = null; // ConstantContext;
+    this.max = null; // ConstantContext;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -8046,23 +8090,27 @@ BetweenPredicateContext.prototype.constructor = BetweenPredicateContext;
 
 SqlParser.BetweenPredicateContext = BetweenPredicateContext;
 
-BetweenPredicateContext.prototype.expressionAtom = function(i) {
-    if(i===undefined) {
-        i = null;
-    }
-    if(i===null) {
-        return this.getTypedRuleContexts(ExpressionAtomContext);
-    } else {
-        return this.getTypedRuleContext(ExpressionAtomContext,i);
-    }
-};
-
 BetweenPredicateContext.prototype.BETWEEN = function() {
     return this.getToken(SqlParser.BETWEEN, 0);
 };
 
 BetweenPredicateContext.prototype.AND = function() {
     return this.getToken(SqlParser.AND, 0);
+};
+
+BetweenPredicateContext.prototype.constOrColumnAtom = function() {
+    return this.getTypedRuleContext(ConstOrColumnAtomContext,0);
+};
+
+BetweenPredicateContext.prototype.constant = function(i) {
+    if(i===undefined) {
+        i = null;
+    }
+    if(i===null) {
+        return this.getTypedRuleContexts(ConstantContext);
+    } else {
+        return this.getTypedRuleContext(ConstantContext,i);
+    }
 };
 
 BetweenPredicateContext.prototype.NOT = function() {
@@ -8079,6 +8127,9 @@ BetweenPredicateContext.prototype.accept = function(visitor) {
 
 function IsNullPredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.not = null; // Token;
+    this.nil = null; // NullLiteralContext;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -8088,12 +8139,12 @@ IsNullPredicateContext.prototype.constructor = IsNullPredicateContext;
 
 SqlParser.IsNullPredicateContext = IsNullPredicateContext;
 
-IsNullPredicateContext.prototype.expressionAtom = function() {
-    return this.getTypedRuleContext(ExpressionAtomContext,0);
-};
-
 IsNullPredicateContext.prototype.IS = function() {
     return this.getToken(SqlParser.IS, 0);
+};
+
+IsNullPredicateContext.prototype.constOrColumnAtom = function() {
+    return this.getTypedRuleContext(ConstOrColumnAtomContext,0);
 };
 
 IsNullPredicateContext.prototype.nullLiteral = function() {
@@ -8112,45 +8163,11 @@ IsNullPredicateContext.prototype.accept = function(visitor) {
 };
 
 
-function BinaryComparasionPredicateContext(parser, ctx) {
-	PredicateContext.call(this, parser);
-    this.left = null; // ExpressionAtomContext;
-    this.op = null; // ComparisonOperatorContext;
-    this.right = null; // ExpressionAtomContext;
-    PredicateContext.prototype.copyFrom.call(this, ctx);
-    return this;
-}
-
-BinaryComparasionPredicateContext.prototype = Object.create(PredicateContext.prototype);
-BinaryComparasionPredicateContext.prototype.constructor = BinaryComparasionPredicateContext;
-
-SqlParser.BinaryComparasionPredicateContext = BinaryComparasionPredicateContext;
-
-BinaryComparasionPredicateContext.prototype.expressionAtom = function(i) {
-    if(i===undefined) {
-        i = null;
-    }
-    if(i===null) {
-        return this.getTypedRuleContexts(ExpressionAtomContext);
-    } else {
-        return this.getTypedRuleContext(ExpressionAtomContext,i);
-    }
-};
-
-BinaryComparasionPredicateContext.prototype.comparisonOperator = function() {
-    return this.getTypedRuleContext(ComparisonOperatorContext,0);
-};
-BinaryComparasionPredicateContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof SqlParserVisitor ) {
-        return visitor.visitBinaryComparasionPredicate(this);
-    } else {
-        return visitor.visitChildren(this);
-    }
-};
-
-
 function LikePredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.not = null; // Token;
+    this.like = null; // Token;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
@@ -8160,12 +8177,12 @@ LikePredicateContext.prototype.constructor = LikePredicateContext;
 
 SqlParser.LikePredicateContext = LikePredicateContext;
 
-LikePredicateContext.prototype.expressionAtom = function() {
-    return this.getTypedRuleContext(ExpressionAtomContext,0);
-};
-
 LikePredicateContext.prototype.LIKE = function() {
     return this.getToken(SqlParser.LIKE, 0);
+};
+
+LikePredicateContext.prototype.constOrColumnAtom = function() {
+    return this.getTypedRuleContext(ConstOrColumnAtomContext,0);
 };
 
 LikePredicateContext.prototype.STRING_LITERAL = function() {
@@ -8186,6 +8203,8 @@ LikePredicateContext.prototype.accept = function(visitor) {
 
 function RegexpPredicateContext(parser, ctx) {
 	PredicateContext.call(this, parser);
+    this.left = null; // ConstOrColumnAtomContext;
+    this.not = null; // Token;
     this.regex = null; // Token;
     PredicateContext.prototype.copyFrom.call(this, ctx);
     return this;
@@ -8196,12 +8215,8 @@ RegexpPredicateContext.prototype.constructor = RegexpPredicateContext;
 
 SqlParser.RegexpPredicateContext = RegexpPredicateContext;
 
-RegexpPredicateContext.prototype.expressionAtom = function() {
-    return this.getTypedRuleContext(ExpressionAtomContext,0);
-};
-
-RegexpPredicateContext.prototype.STRING_LITERAL = function() {
-    return this.getToken(SqlParser.STRING_LITERAL, 0);
+RegexpPredicateContext.prototype.constOrColumnAtom = function() {
+    return this.getTypedRuleContext(ConstOrColumnAtomContext,0);
 };
 
 RegexpPredicateContext.prototype.REGEXP = function() {
@@ -8210,6 +8225,10 @@ RegexpPredicateContext.prototype.REGEXP = function() {
 
 RegexpPredicateContext.prototype.RLIKE = function() {
     return this.getToken(SqlParser.RLIKE, 0);
+};
+
+RegexpPredicateContext.prototype.STRING_LITERAL = function() {
+    return this.getToken(SqlParser.STRING_LITERAL, 0);
 };
 
 RegexpPredicateContext.prototype.NOT = function() {
@@ -8241,13 +8260,13 @@ SqlParser.prototype.predicate = function() {
             localctx = new InPredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
             this.state = 423;
-            this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 425;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if(_la===SqlParser.NOT) {
                 this.state = 424;
-                this.match(SqlParser.NOT);
+                localctx.not = this.match(SqlParser.NOT);
             }
 
             this.state = 427;
@@ -8256,7 +8275,7 @@ SqlParser.prototype.predicate = function() {
             this.match(SqlParser.LR_BRACKET);
 
             this.state = 429;
-            this.constantAtoms();
+            localctx.values = this.constantAtoms();
             this.state = 430;
             this.match(SqlParser.RR_BRACKET);
             break;
@@ -8265,7 +8284,7 @@ SqlParser.prototype.predicate = function() {
             localctx = new IsNullPredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
             this.state = 432;
-            this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 433;
             this.match(SqlParser.IS);
             this.state = 435;
@@ -8273,91 +8292,90 @@ SqlParser.prototype.predicate = function() {
             _la = this._input.LA(1);
             if(_la===SqlParser.NOT) {
                 this.state = 434;
-                this.match(SqlParser.NOT);
+                localctx.not = this.match(SqlParser.NOT);
             }
 
             this.state = 437;
-            this.nullLiteral();
+            localctx.nil = this.nullLiteral();
             break;
 
         case 3:
-            localctx = new BinaryComparasionPredicateContext(this, localctx);
+            localctx = new BinaryComparisonPredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
             this.state = 439;
-            localctx.left = this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 440;
             localctx.op = this.comparisonOperator();
             this.state = 441;
-            localctx.right = this.expressionAtom();
+            localctx.right = this.constOrColumnAtom();
             break;
 
         case 4:
             localctx = new BetweenPredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 4);
             this.state = 443;
-            this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 445;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if(_la===SqlParser.NOT) {
                 this.state = 444;
-                this.match(SqlParser.NOT);
+                localctx.not = this.match(SqlParser.NOT);
             }
 
             this.state = 447;
             this.match(SqlParser.BETWEEN);
             this.state = 448;
-            this.expressionAtom();
+            localctx.min = this.constant();
             this.state = 449;
             this.match(SqlParser.AND);
             this.state = 450;
-            this.expressionAtom();
+            localctx.max = this.constant();
             break;
 
         case 5:
             localctx = new LikePredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 5);
             this.state = 452;
-            this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 454;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if(_la===SqlParser.NOT) {
                 this.state = 453;
-                this.match(SqlParser.NOT);
+                localctx.not = this.match(SqlParser.NOT);
             }
 
             this.state = 456;
             this.match(SqlParser.LIKE);
             this.state = 457;
-            this.match(SqlParser.STRING_LITERAL);
+            localctx.like = this.match(SqlParser.STRING_LITERAL);
             break;
 
         case 6:
             localctx = new RegexpPredicateContext(this, localctx);
             this.enterOuterAlt(localctx, 6);
             this.state = 459;
-            this.expressionAtom();
+            localctx.left = this.constOrColumnAtom();
             this.state = 461;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             if(_la===SqlParser.NOT) {
                 this.state = 460;
-                this.match(SqlParser.NOT);
+                localctx.not = this.match(SqlParser.NOT);
             }
 
             this.state = 463;
-            localctx.regex = this._input.LT(1);
             _la = this._input.LA(1);
             if(!(_la===SqlParser.REGEXP || _la===SqlParser.RLIKE)) {
-                localctx.regex = this._errHandler.recoverInline(this);
+            this._errHandler.recoverInline(this);
             }
             else {
             	this._errHandler.reportMatch(this);
                 this.consume();
             }
             this.state = 464;
-            this.match(SqlParser.STRING_LITERAL);
+            localctx.regex = this.match(SqlParser.STRING_LITERAL);
             break;
 
         case 7:
@@ -8550,781 +8568,22 @@ SqlParser.prototype.constOrColumnAtom = function() {
     try {
         this.state = 479;
         this._errHandler.sync(this);
-        switch(this._input.LA(1)) {
-        case SqlParser.EOF:
-        case SqlParser.DELETE:
-        case SqlParser.FALSE:
-        case SqlParser.INSERT:
-        case SqlParser.LIMIT:
-        case SqlParser.NULL_LITERAL:
-        case SqlParser.ORDER:
-        case SqlParser.SELECT:
-        case SqlParser.TRUE:
-        case SqlParser.UPDATE:
-        case SqlParser.WHERE:
-        case SqlParser.MINUSMINUS:
-        case SqlParser.MINUS:
-        case SqlParser.COMMA:
-        case SqlParser.SEMI:
-        case SqlParser.ZERO_DECIMAL:
-        case SqlParser.ONE_DECIMAL:
-        case SqlParser.TWO_DECIMAL:
-        case SqlParser.STRING_LITERAL:
-        case SqlParser.DECIMAL_LITERAL:
-        case SqlParser.HEXADECIMAL_LITERAL:
-        case SqlParser.REAL_LITERAL:
-        case SqlParser.NULL_SPEC_LITERAL:
-        case SqlParser.STRING_CHARSET_NAME:
+        var la_ = this._interp.adaptivePredict(this._input,64,this._ctx);
+        switch(la_) {
+        case 1:
             localctx = new ConstantValueAtomContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
             this.state = 477;
             this.constant();
             break;
-        case SqlParser.CURRENT:
-        case SqlParser.DATABASE:
-        case SqlParser.DIAGNOSTICS:
-        case SqlParser.LEFT:
-        case SqlParser.NUMBER:
-        case SqlParser.RIGHT:
-        case SqlParser.STACKED:
-        case SqlParser.DATE:
-        case SqlParser.TIME:
-        case SqlParser.TIMESTAMP:
-        case SqlParser.DATETIME:
-        case SqlParser.YEAR:
-        case SqlParser.TEXT:
-        case SqlParser.ENUM:
-        case SqlParser.SERIAL:
-        case SqlParser.JSON_VALID:
-        case SqlParser.JSON_SCHEMA_VALID:
-        case SqlParser.COUNT:
-        case SqlParser.POSITION:
-        case SqlParser.ACCOUNT:
-        case SqlParser.ACTION:
-        case SqlParser.AFTER:
-        case SqlParser.AGGREGATE:
-        case SqlParser.ALGORITHM:
-        case SqlParser.ANY:
-        case SqlParser.AT:
-        case SqlParser.AUTHORS:
-        case SqlParser.AUTOCOMMIT:
-        case SqlParser.AUTOEXTEND_SIZE:
-        case SqlParser.AUTO_INCREMENT:
-        case SqlParser.AVG_ROW_LENGTH:
-        case SqlParser.BEGIN:
-        case SqlParser.BINLOG:
-        case SqlParser.BIT:
-        case SqlParser.BLOCK:
-        case SqlParser.BOOL:
-        case SqlParser.BOOLEAN:
-        case SqlParser.BTREE:
-        case SqlParser.CACHE:
-        case SqlParser.CASCADED:
-        case SqlParser.CHAIN:
-        case SqlParser.CHANGED:
-        case SqlParser.CHANNEL:
-        case SqlParser.CHECKSUM:
-        case SqlParser.PAGE_CHECKSUM:
-        case SqlParser.CIPHER:
-        case SqlParser.CLASS_ORIGIN:
-        case SqlParser.CLIENT:
-        case SqlParser.CLOSE:
-        case SqlParser.COALESCE:
-        case SqlParser.CODE:
-        case SqlParser.COLUMNS:
-        case SqlParser.COLUMN_FORMAT:
-        case SqlParser.COLUMN_NAME:
-        case SqlParser.COMMENT:
-        case SqlParser.COMMIT:
-        case SqlParser.COMPACT:
-        case SqlParser.COMPLETION:
-        case SqlParser.COMPRESSED:
-        case SqlParser.COMPRESSION:
-        case SqlParser.CONCURRENT:
-        case SqlParser.CONNECTION:
-        case SqlParser.CONSISTENT:
-        case SqlParser.CONSTRAINT_CATALOG:
-        case SqlParser.CONSTRAINT_SCHEMA:
-        case SqlParser.CONSTRAINT_NAME:
-        case SqlParser.CONTAINS:
-        case SqlParser.CONTEXT:
-        case SqlParser.CONTRIBUTORS:
-        case SqlParser.COPY:
-        case SqlParser.CPU:
-        case SqlParser.CURSOR_NAME:
-        case SqlParser.DATA:
-        case SqlParser.DATAFILE:
-        case SqlParser.DEALLOCATE:
-        case SqlParser.DEFAULT_AUTH:
-        case SqlParser.DEFINER:
-        case SqlParser.DELAY_KEY_WRITE:
-        case SqlParser.DES_KEY_FILE:
-        case SqlParser.DIRECTORY:
-        case SqlParser.DISABLE:
-        case SqlParser.DISCARD:
-        case SqlParser.DISK:
-        case SqlParser.DO:
-        case SqlParser.DUMPFILE:
-        case SqlParser.DUPLICATE:
-        case SqlParser.DYNAMIC:
-        case SqlParser.ENABLE:
-        case SqlParser.ENCRYPTION:
-        case SqlParser.END:
-        case SqlParser.ENDS:
-        case SqlParser.ENGINE:
-        case SqlParser.ENGINES:
-        case SqlParser.ERROR:
-        case SqlParser.ERRORS:
-        case SqlParser.ESCAPE:
-        case SqlParser.EVEN:
-        case SqlParser.EVENT:
-        case SqlParser.EVENTS:
-        case SqlParser.EVERY:
-        case SqlParser.EXCHANGE:
-        case SqlParser.EXCLUSIVE:
-        case SqlParser.EXPIRE:
-        case SqlParser.EXPORT:
-        case SqlParser.EXTENDED:
-        case SqlParser.EXTENT_SIZE:
-        case SqlParser.FAST:
-        case SqlParser.FAULTS:
-        case SqlParser.FIELDS:
-        case SqlParser.FILE_BLOCK_SIZE:
-        case SqlParser.FILTER:
-        case SqlParser.FIRST:
-        case SqlParser.FIXED:
-        case SqlParser.FLUSH:
-        case SqlParser.FOLLOWS:
-        case SqlParser.FOUND:
-        case SqlParser.FULL:
-        case SqlParser.FUNCTION:
-        case SqlParser.GENERAL:
-        case SqlParser.GLOBAL:
-        case SqlParser.GRANTS:
-        case SqlParser.GROUP_REPLICATION:
-        case SqlParser.HANDLER:
-        case SqlParser.HASH:
-        case SqlParser.HELP:
-        case SqlParser.HOST:
-        case SqlParser.HOSTS:
-        case SqlParser.IDENTIFIED:
-        case SqlParser.IGNORE_SERVER_IDS:
-        case SqlParser.IMPORT:
-        case SqlParser.INDEXES:
-        case SqlParser.INITIAL_SIZE:
-        case SqlParser.INPLACE:
-        case SqlParser.INSERT_METHOD:
-        case SqlParser.INSTALL:
-        case SqlParser.INSTANCE:
-        case SqlParser.INVISIBLE:
-        case SqlParser.INVOKER:
-        case SqlParser.IO:
-        case SqlParser.IO_THREAD:
-        case SqlParser.IPC:
-        case SqlParser.ISOLATION:
-        case SqlParser.ISSUER:
-        case SqlParser.JSON:
-        case SqlParser.KEY_BLOCK_SIZE:
-        case SqlParser.LANGUAGE:
-        case SqlParser.LAST:
-        case SqlParser.LEAVES:
-        case SqlParser.LESS:
-        case SqlParser.LEVEL:
-        case SqlParser.LIST:
-        case SqlParser.LOCAL:
-        case SqlParser.LOGFILE:
-        case SqlParser.LOGS:
-        case SqlParser.MASTER:
-        case SqlParser.MASTER_AUTO_POSITION:
-        case SqlParser.MASTER_CONNECT_RETRY:
-        case SqlParser.MASTER_DELAY:
-        case SqlParser.MASTER_HEARTBEAT_PERIOD:
-        case SqlParser.MASTER_HOST:
-        case SqlParser.MASTER_LOG_FILE:
-        case SqlParser.MASTER_LOG_POS:
-        case SqlParser.MASTER_PASSWORD:
-        case SqlParser.MASTER_PORT:
-        case SqlParser.MASTER_RETRY_COUNT:
-        case SqlParser.MASTER_SSL:
-        case SqlParser.MASTER_SSL_CA:
-        case SqlParser.MASTER_SSL_CAPATH:
-        case SqlParser.MASTER_SSL_CERT:
-        case SqlParser.MASTER_SSL_CIPHER:
-        case SqlParser.MASTER_SSL_CRL:
-        case SqlParser.MASTER_SSL_CRLPATH:
-        case SqlParser.MASTER_SSL_KEY:
-        case SqlParser.MASTER_TLS_VERSION:
-        case SqlParser.MASTER_USER:
-        case SqlParser.MAX_CONNECTIONS_PER_HOUR:
-        case SqlParser.MAX_QUERIES_PER_HOUR:
-        case SqlParser.MAX_ROWS:
-        case SqlParser.MAX_SIZE:
-        case SqlParser.MAX_UPDATES_PER_HOUR:
-        case SqlParser.MAX_USER_CONNECTIONS:
-        case SqlParser.MEDIUM:
-        case SqlParser.MERGE:
-        case SqlParser.MESSAGE_TEXT:
-        case SqlParser.MID:
-        case SqlParser.MIGRATE:
-        case SqlParser.MIN_ROWS:
-        case SqlParser.MODE:
-        case SqlParser.MODIFY:
-        case SqlParser.MUTEX:
-        case SqlParser.MYSQL:
-        case SqlParser.MYSQL_ERRNO:
-        case SqlParser.NAME:
-        case SqlParser.NAMES:
-        case SqlParser.NCHAR:
-        case SqlParser.NEVER:
-        case SqlParser.NEXT:
-        case SqlParser.NO:
-        case SqlParser.NODEGROUP:
-        case SqlParser.NONE:
-        case SqlParser.OFFLINE:
-        case SqlParser.OFFSET:
-        case SqlParser.OJ:
-        case SqlParser.OLD_PASSWORD:
-        case SqlParser.ONE:
-        case SqlParser.ONLINE:
-        case SqlParser.ONLY:
-        case SqlParser.OPEN:
-        case SqlParser.OPTIMIZER_COSTS:
-        case SqlParser.OPTIONS:
-        case SqlParser.OWNER:
-        case SqlParser.PACK_KEYS:
-        case SqlParser.PAGE:
-        case SqlParser.PARSER:
-        case SqlParser.PARTIAL:
-        case SqlParser.PARTITIONING:
-        case SqlParser.PARTITIONS:
-        case SqlParser.PASSWORD:
-        case SqlParser.PHASE:
-        case SqlParser.PLUGIN:
-        case SqlParser.PLUGIN_DIR:
-        case SqlParser.PLUGINS:
-        case SqlParser.PORT:
-        case SqlParser.PRECEDES:
-        case SqlParser.PREPARE:
-        case SqlParser.PRESERVE:
-        case SqlParser.PREV:
-        case SqlParser.PROCESSLIST:
-        case SqlParser.PROFILE:
-        case SqlParser.PROFILES:
-        case SqlParser.PROXY:
-        case SqlParser.QUERY:
-        case SqlParser.QUICK:
-        case SqlParser.REBUILD:
-        case SqlParser.RECOVER:
-        case SqlParser.REDO_BUFFER_SIZE:
-        case SqlParser.REDUNDANT:
-        case SqlParser.RELAY:
-        case SqlParser.RELAY_LOG_FILE:
-        case SqlParser.RELAY_LOG_POS:
-        case SqlParser.RELAYLOG:
-        case SqlParser.REMOVE:
-        case SqlParser.REORGANIZE:
-        case SqlParser.REPAIR:
-        case SqlParser.REPLICATE_DO_DB:
-        case SqlParser.REPLICATE_DO_TABLE:
-        case SqlParser.REPLICATE_IGNORE_DB:
-        case SqlParser.REPLICATE_IGNORE_TABLE:
-        case SqlParser.REPLICATE_REWRITE_DB:
-        case SqlParser.REPLICATE_WILD_DO_TABLE:
-        case SqlParser.REPLICATE_WILD_IGNORE_TABLE:
-        case SqlParser.REPLICATION:
-        case SqlParser.RESET:
-        case SqlParser.RESUME:
-        case SqlParser.RETURNED_SQLSTATE:
-        case SqlParser.RETURNS:
-        case SqlParser.ROLE:
-        case SqlParser.ROLLBACK:
-        case SqlParser.ROLLUP:
-        case SqlParser.ROTATE:
-        case SqlParser.ROW:
-        case SqlParser.ROWS:
-        case SqlParser.ROW_FORMAT:
-        case SqlParser.SAVEPOINT:
-        case SqlParser.SCHEDULE:
-        case SqlParser.SECURITY:
-        case SqlParser.SERVER:
-        case SqlParser.SESSION:
-        case SqlParser.SHARE:
-        case SqlParser.SHARED:
-        case SqlParser.SIGNED:
-        case SqlParser.SIMPLE:
-        case SqlParser.SLAVE:
-        case SqlParser.SLOW:
-        case SqlParser.SNAPSHOT:
-        case SqlParser.SOCKET:
-        case SqlParser.SOME:
-        case SqlParser.SONAME:
-        case SqlParser.SOUNDS:
-        case SqlParser.SOURCE:
-        case SqlParser.SQL_AFTER_GTIDS:
-        case SqlParser.SQL_AFTER_MTS_GAPS:
-        case SqlParser.SQL_BEFORE_GTIDS:
-        case SqlParser.SQL_BUFFER_RESULT:
-        case SqlParser.SQL_CACHE:
-        case SqlParser.SQL_NO_CACHE:
-        case SqlParser.SQL_THREAD:
-        case SqlParser.START:
-        case SqlParser.STARTS:
-        case SqlParser.STATS_AUTO_RECALC:
-        case SqlParser.STATS_PERSISTENT:
-        case SqlParser.STATS_SAMPLE_PAGES:
-        case SqlParser.STATUS:
-        case SqlParser.STOP:
-        case SqlParser.STORAGE:
-        case SqlParser.STRING:
-        case SqlParser.SUBCLASS_ORIGIN:
-        case SqlParser.SUBJECT:
-        case SqlParser.SUBPARTITION:
-        case SqlParser.SUBPARTITIONS:
-        case SqlParser.SUSPEND:
-        case SqlParser.SWAPS:
-        case SqlParser.SWITCHES:
-        case SqlParser.TABLE_NAME:
-        case SqlParser.TABLESPACE:
-        case SqlParser.TEMPORARY:
-        case SqlParser.TEMPTABLE:
-        case SqlParser.THAN:
-        case SqlParser.TRADITIONAL:
-        case SqlParser.TRANSACTION:
-        case SqlParser.TRANSACTIONAL:
-        case SqlParser.TRIGGERS:
-        case SqlParser.TRUNCATE:
-        case SqlParser.UNDEFINED:
-        case SqlParser.UNDOFILE:
-        case SqlParser.UNDO_BUFFER_SIZE:
-        case SqlParser.UNINSTALL:
-        case SqlParser.UNKNOWN:
-        case SqlParser.UNTIL:
-        case SqlParser.UPGRADE:
-        case SqlParser.USER:
-        case SqlParser.USE_FRM:
-        case SqlParser.USER_RESOURCES:
-        case SqlParser.VALIDATION:
-        case SqlParser.VALUE:
-        case SqlParser.VARIABLES:
-        case SqlParser.VIEW:
-        case SqlParser.VISIBLE:
-        case SqlParser.WAIT:
-        case SqlParser.WARNINGS:
-        case SqlParser.WITHOUT:
-        case SqlParser.WORK:
-        case SqlParser.WRAPPER:
-        case SqlParser.X509:
-        case SqlParser.XA:
-        case SqlParser.XML:
-        case SqlParser.INTERNAL:
-        case SqlParser.QUARTER:
-        case SqlParser.MONTH:
-        case SqlParser.DAY:
-        case SqlParser.HOUR:
-        case SqlParser.MINUTE:
-        case SqlParser.WEEK:
-        case SqlParser.SECOND:
-        case SqlParser.MICROSECOND:
-        case SqlParser.TABLES:
-        case SqlParser.ROUTINE:
-        case SqlParser.EXECUTE:
-        case SqlParser.FILE:
-        case SqlParser.PROCESS:
-        case SqlParser.RELOAD:
-        case SqlParser.SHUTDOWN:
-        case SqlParser.SUPER:
-        case SqlParser.PRIVILEGES:
-        case SqlParser.AUDIT_ADMIN:
-        case SqlParser.BACKUP_ADMIN:
-        case SqlParser.BINLOG_ADMIN:
-        case SqlParser.BINLOG_ENCRYPTION_ADMIN:
-        case SqlParser.CLONE_ADMIN:
-        case SqlParser.CONNECTION_ADMIN:
-        case SqlParser.ENCRYPTION_KEY_ADMIN:
-        case SqlParser.FIREWALL_ADMIN:
-        case SqlParser.FIREWALL_USER:
-        case SqlParser.GROUP_REPLICATION_ADMIN:
-        case SqlParser.INNODB_REDO_LOG_ARCHIVE:
-        case SqlParser.NDB_STORED_USER:
-        case SqlParser.PERSIST_RO_VARIABLES_ADMIN:
-        case SqlParser.REPLICATION_APPLIER:
-        case SqlParser.REPLICATION_SLAVE_ADMIN:
-        case SqlParser.RESOURCE_GROUP_ADMIN:
-        case SqlParser.RESOURCE_GROUP_USER:
-        case SqlParser.ROLE_ADMIN:
-        case SqlParser.SESSION_VARIABLES_ADMIN:
-        case SqlParser.SET_USER_ID:
-        case SqlParser.SHOW_ROUTINE:
-        case SqlParser.SYSTEM_VARIABLES_ADMIN:
-        case SqlParser.TABLE_ENCRYPTION_ADMIN:
-        case SqlParser.VERSION_TOKEN_ADMIN:
-        case SqlParser.XA_RECOVER_ADMIN:
-        case SqlParser.ARMSCII8:
-        case SqlParser.ASCII:
-        case SqlParser.BIG5:
-        case SqlParser.CP1250:
-        case SqlParser.CP1251:
-        case SqlParser.CP1256:
-        case SqlParser.CP1257:
-        case SqlParser.CP850:
-        case SqlParser.CP852:
-        case SqlParser.CP866:
-        case SqlParser.CP932:
-        case SqlParser.DEC8:
-        case SqlParser.EUCJPMS:
-        case SqlParser.EUCKR:
-        case SqlParser.GB2312:
-        case SqlParser.GBK:
-        case SqlParser.GEOSTD8:
-        case SqlParser.GREEK:
-        case SqlParser.HEBREW:
-        case SqlParser.HP8:
-        case SqlParser.KEYBCS2:
-        case SqlParser.KOI8R:
-        case SqlParser.KOI8U:
-        case SqlParser.LATIN1:
-        case SqlParser.LATIN2:
-        case SqlParser.LATIN5:
-        case SqlParser.LATIN7:
-        case SqlParser.MACCE:
-        case SqlParser.MACROMAN:
-        case SqlParser.SJIS:
-        case SqlParser.SWE7:
-        case SqlParser.TIS620:
-        case SqlParser.UCS2:
-        case SqlParser.UJIS:
-        case SqlParser.UTF16:
-        case SqlParser.UTF16LE:
-        case SqlParser.UTF32:
-        case SqlParser.UTF8:
-        case SqlParser.UTF8MB3:
-        case SqlParser.UTF8MB4:
-        case SqlParser.ARCHIVE:
-        case SqlParser.BLACKHOLE:
-        case SqlParser.CSV:
-        case SqlParser.FEDERATED:
-        case SqlParser.INNODB:
-        case SqlParser.MEMORY:
-        case SqlParser.MRG_MYISAM:
-        case SqlParser.MYISAM:
-        case SqlParser.NDB:
-        case SqlParser.NDBCLUSTER:
-        case SqlParser.PERFORMANCE_SCHEMA:
-        case SqlParser.TOKUDB:
-        case SqlParser.REPEATABLE:
-        case SqlParser.COMMITTED:
-        case SqlParser.UNCOMMITTED:
-        case SqlParser.SERIALIZABLE:
-        case SqlParser.GEOMETRYCOLLECTION:
-        case SqlParser.LINESTRING:
-        case SqlParser.MULTILINESTRING:
-        case SqlParser.MULTIPOINT:
-        case SqlParser.MULTIPOLYGON:
-        case SqlParser.POINT:
-        case SqlParser.POLYGON:
-        case SqlParser.ABS:
-        case SqlParser.ACOS:
-        case SqlParser.ADDDATE:
-        case SqlParser.ADDTIME:
-        case SqlParser.AES_DECRYPT:
-        case SqlParser.AES_ENCRYPT:
-        case SqlParser.AREA:
-        case SqlParser.ASBINARY:
-        case SqlParser.ASIN:
-        case SqlParser.ASTEXT:
-        case SqlParser.ASWKB:
-        case SqlParser.ASWKT:
-        case SqlParser.ASYMMETRIC_DECRYPT:
-        case SqlParser.ASYMMETRIC_DERIVE:
-        case SqlParser.ASYMMETRIC_ENCRYPT:
-        case SqlParser.ASYMMETRIC_SIGN:
-        case SqlParser.ASYMMETRIC_VERIFY:
-        case SqlParser.ATAN:
-        case SqlParser.ATAN2:
-        case SqlParser.BENCHMARK:
-        case SqlParser.BIN:
-        case SqlParser.BIT_COUNT:
-        case SqlParser.BIT_LENGTH:
-        case SqlParser.BUFFER:
-        case SqlParser.CATALOG_NAME:
-        case SqlParser.CEIL:
-        case SqlParser.CEILING:
-        case SqlParser.CENTROID:
-        case SqlParser.CHARACTER_LENGTH:
-        case SqlParser.CHARSET:
-        case SqlParser.CHAR_LENGTH:
-        case SqlParser.COERCIBILITY:
-        case SqlParser.COLLATION:
-        case SqlParser.COMPRESS:
-        case SqlParser.CONCAT:
-        case SqlParser.CONCAT_WS:
-        case SqlParser.CONNECTION_ID:
-        case SqlParser.CONV:
-        case SqlParser.CONVERT_TZ:
-        case SqlParser.COS:
-        case SqlParser.COT:
-        case SqlParser.CRC32:
-        case SqlParser.CREATE_ASYMMETRIC_PRIV_KEY:
-        case SqlParser.CREATE_ASYMMETRIC_PUB_KEY:
-        case SqlParser.CREATE_DH_PARAMETERS:
-        case SqlParser.CREATE_DIGEST:
-        case SqlParser.CROSSES:
-        case SqlParser.DATEDIFF:
-        case SqlParser.DATE_FORMAT:
-        case SqlParser.DAYNAME:
-        case SqlParser.DAYOFMONTH:
-        case SqlParser.DAYOFWEEK:
-        case SqlParser.DAYOFYEAR:
-        case SqlParser.DECODE:
-        case SqlParser.DEGREES:
-        case SqlParser.DES_DECRYPT:
-        case SqlParser.DES_ENCRYPT:
-        case SqlParser.DIMENSION:
-        case SqlParser.DISJOINT:
-        case SqlParser.ELT:
-        case SqlParser.ENCODE:
-        case SqlParser.ENCRYPT:
-        case SqlParser.ENDPOINT:
-        case SqlParser.ENVELOPE:
-        case SqlParser.EQUALS:
-        case SqlParser.EXP:
-        case SqlParser.EXPORT_SET:
-        case SqlParser.EXTERIORRING:
-        case SqlParser.EXTRACTVALUE:
-        case SqlParser.FIELD:
-        case SqlParser.FIND_IN_SET:
-        case SqlParser.FLOOR:
-        case SqlParser.FORMAT:
-        case SqlParser.FOUND_ROWS:
-        case SqlParser.FROM_BASE64:
-        case SqlParser.FROM_DAYS:
-        case SqlParser.FROM_UNIXTIME:
-        case SqlParser.GEOMCOLLFROMTEXT:
-        case SqlParser.GEOMCOLLFROMWKB:
-        case SqlParser.GEOMETRYCOLLECTIONFROMTEXT:
-        case SqlParser.GEOMETRYCOLLECTIONFROMWKB:
-        case SqlParser.GEOMETRYFROMTEXT:
-        case SqlParser.GEOMETRYFROMWKB:
-        case SqlParser.GEOMETRYN:
-        case SqlParser.GEOMETRYTYPE:
-        case SqlParser.GEOMFROMTEXT:
-        case SqlParser.GEOMFROMWKB:
-        case SqlParser.GET_FORMAT:
-        case SqlParser.GET_LOCK:
-        case SqlParser.GLENGTH:
-        case SqlParser.GREATEST:
-        case SqlParser.GTID_SUBSET:
-        case SqlParser.GTID_SUBTRACT:
-        case SqlParser.HEX:
-        case SqlParser.IFNULL:
-        case SqlParser.INET6_ATON:
-        case SqlParser.INET6_NTOA:
-        case SqlParser.INET_ATON:
-        case SqlParser.INET_NTOA:
-        case SqlParser.INSTR:
-        case SqlParser.INTERIORRINGN:
-        case SqlParser.INTERSECTS:
-        case SqlParser.ISCLOSED:
-        case SqlParser.ISEMPTY:
-        case SqlParser.ISNULL:
-        case SqlParser.ISSIMPLE:
-        case SqlParser.IS_FREE_LOCK:
-        case SqlParser.IS_IPV4:
-        case SqlParser.IS_IPV4_COMPAT:
-        case SqlParser.IS_IPV4_MAPPED:
-        case SqlParser.IS_IPV6:
-        case SqlParser.IS_USED_LOCK:
-        case SqlParser.LAST_INSERT_ID:
-        case SqlParser.LCASE:
-        case SqlParser.LEAST:
-        case SqlParser.LENGTH:
-        case SqlParser.LINEFROMTEXT:
-        case SqlParser.LINEFROMWKB:
-        case SqlParser.LINESTRINGFROMTEXT:
-        case SqlParser.LINESTRINGFROMWKB:
-        case SqlParser.LN:
-        case SqlParser.LOAD_FILE:
-        case SqlParser.LOCATE:
-        case SqlParser.LOG:
-        case SqlParser.LOG10:
-        case SqlParser.LOG2:
-        case SqlParser.LOWER:
-        case SqlParser.LPAD:
-        case SqlParser.LTRIM:
-        case SqlParser.MAKEDATE:
-        case SqlParser.MAKETIME:
-        case SqlParser.MAKE_SET:
-        case SqlParser.MASTER_POS_WAIT:
-        case SqlParser.MBRCONTAINS:
-        case SqlParser.MBRDISJOINT:
-        case SqlParser.MBREQUAL:
-        case SqlParser.MBRINTERSECTS:
-        case SqlParser.MBROVERLAPS:
-        case SqlParser.MBRTOUCHES:
-        case SqlParser.MBRWITHIN:
-        case SqlParser.MD5:
-        case SqlParser.MLINEFROMTEXT:
-        case SqlParser.MLINEFROMWKB:
-        case SqlParser.MONTHNAME:
-        case SqlParser.MPOINTFROMTEXT:
-        case SqlParser.MPOINTFROMWKB:
-        case SqlParser.MPOLYFROMTEXT:
-        case SqlParser.MPOLYFROMWKB:
-        case SqlParser.MULTILINESTRINGFROMTEXT:
-        case SqlParser.MULTILINESTRINGFROMWKB:
-        case SqlParser.MULTIPOINTFROMTEXT:
-        case SqlParser.MULTIPOINTFROMWKB:
-        case SqlParser.MULTIPOLYGONFROMTEXT:
-        case SqlParser.MULTIPOLYGONFROMWKB:
-        case SqlParser.NAME_CONST:
-        case SqlParser.NULLIF:
-        case SqlParser.NUMGEOMETRIES:
-        case SqlParser.NUMINTERIORRINGS:
-        case SqlParser.NUMPOINTS:
-        case SqlParser.OCT:
-        case SqlParser.OCTET_LENGTH:
-        case SqlParser.ORD:
-        case SqlParser.OVERLAPS:
-        case SqlParser.PERIOD_ADD:
-        case SqlParser.PERIOD_DIFF:
-        case SqlParser.PI:
-        case SqlParser.POINTFROMTEXT:
-        case SqlParser.POINTFROMWKB:
-        case SqlParser.POINTN:
-        case SqlParser.POLYFROMTEXT:
-        case SqlParser.POLYFROMWKB:
-        case SqlParser.POLYGONFROMTEXT:
-        case SqlParser.POLYGONFROMWKB:
-        case SqlParser.POW:
-        case SqlParser.POWER:
-        case SqlParser.QUOTE:
-        case SqlParser.RADIANS:
-        case SqlParser.RAND:
-        case SqlParser.RANDOM_BYTES:
-        case SqlParser.RELEASE_LOCK:
-        case SqlParser.REVERSE:
-        case SqlParser.ROUND:
-        case SqlParser.ROW_COUNT:
-        case SqlParser.RPAD:
-        case SqlParser.RTRIM:
-        case SqlParser.SEC_TO_TIME:
-        case SqlParser.SESSION_USER:
-        case SqlParser.SHA:
-        case SqlParser.SHA1:
-        case SqlParser.SHA2:
-        case SqlParser.SCHEMA_NAME:
-        case SqlParser.SIGN:
-        case SqlParser.SIN:
-        case SqlParser.SLEEP:
-        case SqlParser.SOUNDEX:
-        case SqlParser.SQL_THREAD_WAIT_AFTER_GTIDS:
-        case SqlParser.SQRT:
-        case SqlParser.SRID:
-        case SqlParser.STARTPOINT:
-        case SqlParser.STRCMP:
-        case SqlParser.STR_TO_DATE:
-        case SqlParser.ST_AREA:
-        case SqlParser.ST_ASBINARY:
-        case SqlParser.ST_ASTEXT:
-        case SqlParser.ST_ASWKB:
-        case SqlParser.ST_ASWKT:
-        case SqlParser.ST_BUFFER:
-        case SqlParser.ST_CENTROID:
-        case SqlParser.ST_CONTAINS:
-        case SqlParser.ST_CROSSES:
-        case SqlParser.ST_DIFFERENCE:
-        case SqlParser.ST_DIMENSION:
-        case SqlParser.ST_DISJOINT:
-        case SqlParser.ST_DISTANCE:
-        case SqlParser.ST_ENDPOINT:
-        case SqlParser.ST_ENVELOPE:
-        case SqlParser.ST_EQUALS:
-        case SqlParser.ST_EXTERIORRING:
-        case SqlParser.ST_GEOMCOLLFROMTEXT:
-        case SqlParser.ST_GEOMCOLLFROMTXT:
-        case SqlParser.ST_GEOMCOLLFROMWKB:
-        case SqlParser.ST_GEOMETRYCOLLECTIONFROMTEXT:
-        case SqlParser.ST_GEOMETRYCOLLECTIONFROMWKB:
-        case SqlParser.ST_GEOMETRYFROMTEXT:
-        case SqlParser.ST_GEOMETRYFROMWKB:
-        case SqlParser.ST_GEOMETRYN:
-        case SqlParser.ST_GEOMETRYTYPE:
-        case SqlParser.ST_GEOMFROMTEXT:
-        case SqlParser.ST_GEOMFROMWKB:
-        case SqlParser.ST_INTERIORRINGN:
-        case SqlParser.ST_INTERSECTION:
-        case SqlParser.ST_INTERSECTS:
-        case SqlParser.ST_ISCLOSED:
-        case SqlParser.ST_ISEMPTY:
-        case SqlParser.ST_ISSIMPLE:
-        case SqlParser.ST_LINEFROMTEXT:
-        case SqlParser.ST_LINEFROMWKB:
-        case SqlParser.ST_LINESTRINGFROMTEXT:
-        case SqlParser.ST_LINESTRINGFROMWKB:
-        case SqlParser.ST_NUMGEOMETRIES:
-        case SqlParser.ST_NUMINTERIORRING:
-        case SqlParser.ST_NUMINTERIORRINGS:
-        case SqlParser.ST_NUMPOINTS:
-        case SqlParser.ST_OVERLAPS:
-        case SqlParser.ST_POINTFROMTEXT:
-        case SqlParser.ST_POINTFROMWKB:
-        case SqlParser.ST_POINTN:
-        case SqlParser.ST_POLYFROMTEXT:
-        case SqlParser.ST_POLYFROMWKB:
-        case SqlParser.ST_POLYGONFROMTEXT:
-        case SqlParser.ST_POLYGONFROMWKB:
-        case SqlParser.ST_SRID:
-        case SqlParser.ST_STARTPOINT:
-        case SqlParser.ST_SYMDIFFERENCE:
-        case SqlParser.ST_TOUCHES:
-        case SqlParser.ST_UNION:
-        case SqlParser.ST_WITHIN:
-        case SqlParser.ST_X:
-        case SqlParser.ST_Y:
-        case SqlParser.SUBDATE:
-        case SqlParser.SUBSTRING_INDEX:
-        case SqlParser.SUBTIME:
-        case SqlParser.SYSTEM_USER:
-        case SqlParser.TAN:
-        case SqlParser.TIMEDIFF:
-        case SqlParser.TIMESTAMPADD:
-        case SqlParser.TIMESTAMPDIFF:
-        case SqlParser.TIME_FORMAT:
-        case SqlParser.TIME_TO_SEC:
-        case SqlParser.TOUCHES:
-        case SqlParser.TO_BASE64:
-        case SqlParser.TO_DAYS:
-        case SqlParser.TO_SECONDS:
-        case SqlParser.UCASE:
-        case SqlParser.UNCOMPRESS:
-        case SqlParser.UNCOMPRESSED_LENGTH:
-        case SqlParser.UNHEX:
-        case SqlParser.UNIX_TIMESTAMP:
-        case SqlParser.UPDATEXML:
-        case SqlParser.UPPER:
-        case SqlParser.UUID:
-        case SqlParser.UUID_SHORT:
-        case SqlParser.VALIDATE_PASSWORD_STRENGTH:
-        case SqlParser.VERSION:
-        case SqlParser.WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS:
-        case SqlParser.WEEKDAY:
-        case SqlParser.WEEKOFYEAR:
-        case SqlParser.WEIGHT_STRING:
-        case SqlParser.WITHIN:
-        case SqlParser.YEARWEEK:
-        case SqlParser.Y_FUNCTION:
-        case SqlParser.X_FUNCTION:
-        case SqlParser.ID:
-        case SqlParser.DOUBLE_QUOTE_ID:
-        case SqlParser.REVERSE_QUOTE_ID:
-        case SqlParser.BLOCKED_QUOTE_ID:
+
+        case 2:
             localctx = new FullColumnNameValueAtomContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
             this.state = 478;
             this.fullColumnName();
             break;
-        default:
-            throw new antlr4.error.NoViableAltException(this);
+
         }
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {

@@ -180,7 +180,10 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#fromClause.
   override visitFromClause(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [, from, , where] = this.visitChildren(ctx);
+    if (where) {
+      this.current.where = where;
+    }
   }
 
   // Visit a parse tree produced by SqlParser#limitClause.
@@ -297,7 +300,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#notExpression.
   override visitNotExpression(ctx: ParserRuleContext) {
-    const result = this.visitChildren(ctx);
+    const [result] = this.visitChildren(ctx);
     result.not = !result.not;
     return result;
   }
@@ -311,13 +314,13 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     } else {
       exp.or = [left, right];
     }
-    console.log(exp);
     return exp;
   }
 
   // Visit a parse tree produced by SqlParser#predicateExpression.
   override visitPredicateExpression(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#inPredicate.
@@ -330,8 +333,8 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     return this.visitChildren(ctx);
   }
 
-  // Visit a parse tree produced by SqlParser#binaryComparasionPredicate.
-  override visitBinaryComparasionPredicate(ctx: ParserRuleContext) {
+  // Visit a parse tree produced by SqlParser#binaryComparisonPredicate.
+  override visitBinaryComparisonPredicate(ctx: ParserRuleContext) {
     const [left, op, right] = this.visitChildren(ctx);
     const predicate: SqlPredicate = { left, op, right };
     return predicate;
@@ -354,7 +357,8 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#expressionAtomPredicate.
   override visitExpressionAtomPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#constantAtoms.
@@ -371,7 +375,11 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#fullColumnNameValueAtom.
   override visitFullColumnNameValueAtom(ctx: ParserRuleContext) {
     const [value] = this.visitChildren(ctx);
-    return value;
+    const column: SqlValue = {
+      type: "column",
+      value,
+    };
+    return column;
   }
 
   // Visit a parse tree produced by SqlParser#constantExpressionAtom.
@@ -383,7 +391,11 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#fullColumnNameExpressionAtom.
   override visitFullColumnNameExpressionAtom(ctx: ParserRuleContext) {
     const [value] = this.visitChildren(ctx);
-    return value;
+    const column: SqlValue = {
+      type: "column",
+      value,
+    };
+    return column;
   }
 
   // Visit a parse tree produced by SqlParser#nestedExpressionAtom.
@@ -404,40 +416,5 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       return "AND";
     }
     return "OR";
-  }
-
-  // Visit a parse tree produced by SqlParser#charsetNameBase.
-  override visitCharsetNameBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#transactionLevelBase.
-  override visitTransactionLevelBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#privilegesBase.
-  override visitPrivilegesBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#intervalTypeBase.
-  override visitIntervalTypeBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#dataTypeBase.
-  override visitDataTypeBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#keywordsCanBeId.
-  override visitKeywordsCanBeId(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
-  }
-
-  // Visit a parse tree produced by SqlParser#functionNameBase.
-  override visitFunctionNameBase(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
   }
 }

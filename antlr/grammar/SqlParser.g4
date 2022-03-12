@@ -229,19 +229,19 @@ constantsOrDefaults
     ;
 
 expression
-    : notOperator=(NOT | '!') expression                            #notExpression
+    : not=(NOT | '!') expression                                    #notExpression
     | expression op=logicalOperator expression                      #logicalExpression
     | predicate                                                     #predicateExpression
     ;
 
 predicate
-    : expressionAtom NOT? IN '(' (constantAtoms) ')'                     #inPredicate
-    | expressionAtom IS NOT? nullLiteral                                 #isNullPredicate
-    | left=expressionAtom op=comparisonOperator right=expressionAtom     #binaryComparasionPredicate
-    | expressionAtom NOT? BETWEEN expressionAtom AND expressionAtom      #betweenPredicate
-    | expressionAtom NOT? LIKE STRING_LITERAL                            #likePredicate
-    | expressionAtom NOT? regex=(REGEXP | RLIKE) STRING_LITERAL          #regexpPredicate
-    | expressionAtom                                                     #expressionAtomPredicate
+    : left=constOrColumnAtom not=NOT? IN '(' (values=constantAtoms) ')'           #inPredicate
+    | left=constOrColumnAtom IS not=NOT? nil=nullLiteral                          #isNullPredicate
+    | left=constOrColumnAtom op=comparisonOperator right=constOrColumnAtom        #binaryComparisonPredicate
+    | left=constOrColumnAtom not=NOT? BETWEEN min=constant AND max=constant       #betweenPredicate
+    | left=constOrColumnAtom not=NOT? LIKE like=STRING_LITERAL                    #likePredicate
+    | left=constOrColumnAtom not=NOT? (REGEXP | RLIKE) regex=STRING_LITERAL       #regexpPredicate
+    | expressionAtom                                                              #expressionAtomPredicate
     ;
 
 constantAtoms

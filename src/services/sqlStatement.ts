@@ -28,7 +28,7 @@ export interface SqlOrder extends IHaveName {
 }
 
 export interface SqlValue {
-  type: "string" | "number" | "hexadecimal" | "boolean" | "null";
+  type: "column" | "string" | "number" | "hexadecimal" | "boolean" | "null";
   value: string;
 }
 
