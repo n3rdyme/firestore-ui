@@ -113,11 +113,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   override visitSqlStatement(ctx: ParserRuleContext) {
     const [result] = this.visitChildren(ctx);
     if (result.where) {
-      try {
-        result.condition = new ExpressionNormalizer().normalize(result.where);
-      } catch (e: unknown) {
-        console.error(e);
-      }
+      result.query = new ExpressionNormalizer().normalize(result.where);
     }
     this.output.push(result);
   }
