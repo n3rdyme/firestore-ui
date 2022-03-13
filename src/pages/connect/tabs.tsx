@@ -11,6 +11,7 @@ import { FaDatabase, FaUpload } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { TabConfig, TabsDisplay } from "../../components/tabsDisplay";
 import { QueryView } from "./components/queryView";
+import { UpsertView } from "./components/upsertView";
 
 export function DatabaseTabs() {
   const navigate = useNavigate();
@@ -47,6 +48,13 @@ export function DatabaseTabs() {
           }
         >
           <QueryView />
+        </div>
+        <div
+          className={
+            currentTabId === "upsert" ? "flex-grow flex flex-col" : "hidden"
+          }
+        >
+          <UpsertView />
         </div>
       </div>
     </div>
