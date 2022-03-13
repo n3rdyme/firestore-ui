@@ -16,7 +16,7 @@ export const useWindowWidth = () => {
     const handleResize = () => setValue(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [setValue]);
 
   return value;
 };

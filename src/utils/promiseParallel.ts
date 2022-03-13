@@ -32,7 +32,6 @@ export function promiseParallel<TArray, TResult>(
       ? Promise.resolve()
       : Promise.resolve(offset++)
           .then((ix) => {
-            console.log("input[ix]", { input, ix, data: input[ix] });
             return mapper(input[ix]).then((result) => {
               results[ix] = result;
             });

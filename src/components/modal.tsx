@@ -6,7 +6,7 @@
  * ****************************************************************************
  */
 
-import React, { useCallback } from "react";
+import React from "react";
 
 export type ModalProps = { shown: boolean; onOverlayClick?: () => void } & Pick<
   React.HTMLProps<HTMLDivElement>,

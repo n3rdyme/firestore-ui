@@ -71,7 +71,6 @@ export function UpsertView() {
 
   const upsertOne = useCallback(
     (collectionName: string, documentId: string | undefined, data: any) => {
-      console.log("upsert", data);
       const id = !documentId ? undefined : data?.[documentId];
       return upsertDoc(collectionName, id, data);
     },

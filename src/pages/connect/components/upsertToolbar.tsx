@@ -43,7 +43,7 @@ export function UpsertToolbar({ jsonValid, onUpload }: UpsertToolbarProps) {
     if (jsonValid && collectionName) {
       onUpload(collectionName, documentId);
     }
-  }, [onUpload]);
+  }, [collectionName, documentId, jsonValid, onUpload]);
 
   const notReady = !jsonValid || !collectionName;
 

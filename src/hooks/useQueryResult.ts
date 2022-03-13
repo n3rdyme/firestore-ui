@@ -16,7 +16,7 @@ import {
   DocumentData,
   QueryConstraint,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFirestore } from "../services/firebaseApp";
 
 export function useQueryResult(
@@ -63,5 +63,8 @@ export function useQueryResult(
     [fs?.app, path, JSON.stringify(options ?? {})]
   );
 
-  return { working: !inProgress, result, error };
+  return useMemo(
+    () => ({ working: !inProgress, result, error }),
+    [inProgress, result, error]
+  );
 }
