@@ -12,12 +12,12 @@ import { SqlStatement } from "../services/sqlStatement";
 import { SqlStatementVisitor } from "../services/sqlStatementVisitor";
 
 export interface ParsedSQLResult {
-  sql: string;
-  errors?: ParserError;
+  sql?: string;
+  errors?: ParserError[];
   statements: SqlStatement[];
 }
 
-export function useParsedSQL(sql?: string) {
+export function useParsedSQL(sql?: string): ParsedSQLResult {
   const [statements, setStatements] = useState<SqlStatement[]>([]);
   const [errors, setErrors] = useState<ParserError[]>();
 

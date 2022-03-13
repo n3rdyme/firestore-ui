@@ -19,7 +19,7 @@ export interface QueryEditProps {
 export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
   return (
     <div className="flex-grow flex flex-col">
-      <div className="flex flex-col flex-grow relative">
+      <div className="flex flex-col flex-grow relative overflow-clip">
         <Editor
           className="absolute top-0 left-0 right-0 bottom-0 border"
           defaultLanguage="sql"

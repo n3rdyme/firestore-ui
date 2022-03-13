@@ -86,6 +86,10 @@
     @apply text-lg font-bold text-dark;
   }
 
+  h3 {
+    @apply text-base font-bold text-dark;
+  }
+
   section {
     @apply flex flex-col flex-grow p-4;
   }

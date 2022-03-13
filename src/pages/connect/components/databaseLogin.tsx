@@ -23,7 +23,7 @@ export function DatabaseLogin() {
 
   useEffect(() => {
     if (auth?.user?.uid) {
-      setTimeout(() => navigate("../query"), 0);
+      setTimeout(() => navigate("../tabs/query"), 0);
     }
   }, [auth?.user?.uid, navigate]);
 

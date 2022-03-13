@@ -14,7 +14,7 @@ import { PageNotFound } from "../../components/pageNotFound";
 import { TestConnection } from "./components/testConnection";
 import { FirebaseAppAuth } from "../../services/firebaseAppAuth";
 import { DatabaseLogin } from "./components/databaseLogin";
-import { DatabaseQuery } from "./query";
+import { DatabaseTabs } from "./tabs";
 
 export function ConnectDatabase() {
   const configJson = useParams<{ config: string }>();
@@ -44,7 +44,7 @@ export function ConnectDatabase() {
         <Routes>
           <Route path="" element={<TestConnection />} />
           <Route path="login" element={<DatabaseLogin />} />
-          <Route path="query" element={<DatabaseQuery />} />
+          <Route path="tabs/:tabId" element={<DatabaseTabs />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </FirebaseAppAuth>

@@ -6,6 +6,7 @@
  * ****************************************************************************
  */
 import React, { useCallback, useMemo } from "react";
+import { classNames } from "../utils/classNames";
 
 export interface SplitterProps {
   minSize?: number;
@@ -53,18 +54,25 @@ export function Splitter({ minSize, defaultSize, top, bottom }: SplitterProps) {
 
   return (
     <div className="flex-grow flex flex-col">
-      <div className="flex flex-col" style={style}>
+      <div
+        className={classNames("flex flex-col", { "flex-grow": bottom == null })}
+        style={bottom != null ? style : undefined}
+      >
         {top}
       </div>
-      <div
-        className="py-1 cursor-ns-resize bg-gradient-to-t from-gray-200 to-gray-400"
-        onPointerDown={onPointerDown}
-        onPointerMoveCapture={onPointerMove}
-        onPointerUpCapture={onPointerUp}
-      >
-        <div className="border border-gray-400" />
-      </div>
-      <div className="flex-grow flex flex-col">{bottom}</div>
+      {bottom != null && (
+        <>
+          <div
+            className="h-2 cursor-ns-resize bg-gradient-to-t from-gray-200 to-gray-400"
+            onPointerDown={onPointerDown}
+            onPointerMoveCapture={onPointerMove}
+            onPointerUpCapture={onPointerUp}
+          >
+            <div className="h-2 border border-gray-400" />
+          </div>
+          <div className="flex-grow flex flex-col">{bottom}</div>
+        </>
+      )}
     </div>
   );
 }
