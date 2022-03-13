@@ -39,17 +39,25 @@ export interface SqlValue {
   valueBool?: boolean;
 }
 
-export interface SqlCondition {
+export interface SqlPredicate {
   not?: boolean;
   left?: SqlColumn | SqlValue;
   op?: "=" | "!=" | ">" | "<" | ">=" | "<=" | "like" | "rlike" | "regex";
   right?: SqlColumn | SqlValue;
 }
 
+export interface SqlNormalizedAnd {
+  and: SqlPredicate[];
+}
+
+export interface SqlNormalExpression {
+  or: SqlNormalizedAnd[];
+}
+
 export interface SqlExpression {
   not?: boolean;
-  and?: (SqlExpression | SqlCondition)[];
-  or?: (SqlExpression | SqlCondition)[];
+  and?: (SqlExpression & SqlPredicate)[];
+  or?: (SqlExpression & SqlPredicate)[];
 }
 
 export interface SqlStatement {
@@ -59,6 +67,7 @@ export interface SqlStatement {
   values?: SqlValue[][];
   orderBy?: SqlOrder[];
   where?: string;
+  query?: SqlNormalExpression;
   limit?: number;
   offset?: number;
 }

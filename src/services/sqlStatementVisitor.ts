@@ -11,13 +11,14 @@ import { SqlParser } from "./sqlParser/lib/SqlParser";
 import { GenericSQL, ParserError, SqlParserVisitor } from "./sqlParser";
 import {
   SqlColumn,
-  SqlCondition as SqlPredicate,
+  SqlPredicate,
   SqlExpression,
   SqlOrder,
   SqlStatement,
   SqlTable,
   SqlValue,
 } from "./sqlStatement";
+import { ExpressionNormalizer } from "./expressionNormalizer";
 
 // using this character to separate the names in multi-part names
 export const DOTTED_ID_CHAR = `\u0000`;
@@ -111,6 +112,13 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#sqlStatement.
   override visitSqlStatement(ctx: ParserRuleContext) {
     const [result] = this.visitChildren(ctx);
+    if (result.where) {
+      try {
+        result.condition = new ExpressionNormalizer().normalize(result.where);
+      } catch (e: unknown) {
+        console.error(e);
+      }
+    }
     this.output.push(result);
   }
 
@@ -562,15 +570,16 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#notExpression.
   override visitNotExpression(ctx: ParserRuleContext) {
-    const [result] = this.visitChildren(ctx);
-    result.not = !result.not;
-    return result;
+    const [, exp] = this.visitChildren(ctx);
+    exp.not = !exp.not;
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#logicalExpression.
   override visitLogicalExpression(ctx: ParserRuleContext) {
     const exp: SqlExpression = {};
-    const [left, op, right] = this.visitChildren(ctx);
+    const children = this.visitChildren(ctx);
+    const [left, op, right] = children;
     if (op === "AND") {
       exp.and = [left, right];
     } else {
@@ -662,8 +671,8 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#nestedExpressionAtom.
   override visitNestedExpressionAtom(ctx: ParserRuleContext) {
-    const [child] = this.visitChildren(ctx);
-    return child;
+    const [, exp] = this.visitChildren(ctx);
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#comparisonOperator.
