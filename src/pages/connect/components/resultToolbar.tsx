@@ -39,7 +39,7 @@ export function ResultToolbar({
         <FaCode className="mr-1" /> JSON Data
       </button>
       <button type="button" className="bg-light py-1" onClick={onInspect}>
-        <BsZoomIn /> Inspect
+        <BsZoomIn className="mr-1" /> Inspect
       </button>
       <div className="flex-grow" />
     </div>
