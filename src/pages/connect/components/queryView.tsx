@@ -9,7 +9,7 @@
 import React, { useCallback } from "react";
 import { Splitter } from "../../../components/splitter";
 import { useParsedSQL } from "../../../hooks/useParsedSQL";
-import { DefaultQuery, ResultViewType } from "./constants";
+import { DefaultQuery, QueryViewType } from "./constants";
 import { QueryEdit } from "./queryEdit";
 import { QueryHelp } from "./queryHelp";
 import { JsonInspect } from "./jsonInspect";
@@ -17,12 +17,12 @@ import { QueryRunner } from "./queryRunner";
 import { QueryToolbar } from "./queryToolbar";
 
 export function QueryView() {
-  const [resultType, setResultType] = React.useState<ResultViewType>("none");
+  const [resultType, setResultType] = React.useState<QueryViewType>("none");
   const [resultTime, setResultTime] = React.useState("");
   const [query, setQuery] = React.useState<string | undefined>(DefaultQuery);
   const parsed = useParsedSQL(query);
 
-  const onChangeResultType = useCallback((changeType: ResultViewType) => {
+  const onChangeResultType = useCallback((changeType: QueryViewType) => {
     setResultType(changeType);
     setResultTime(`${changeType}@${new Date().toISOString()}`);
   }, []);

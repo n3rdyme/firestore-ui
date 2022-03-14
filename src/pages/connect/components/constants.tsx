@@ -6,7 +6,9 @@
  * ****************************************************************************
  */
 
-export type ResultViewType = "none" | "run" | "inspect" | "help";
+export type QueryViewType = "none" | "run" | "inspect" | "help";
+
+export type ResultViewType = "table" | "json" | "inspect";
 
 export const DefaultQuery = `/*
  * Enter your sql query here 

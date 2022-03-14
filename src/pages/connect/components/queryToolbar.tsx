@@ -9,11 +9,11 @@
 import React, { useCallback } from "react";
 import { BsZoomIn } from "react-icons/bs";
 import { FaPlayCircle, FaQuestionCircle } from "react-icons/fa";
-import { ResultViewType } from "./constants";
+import { QueryViewType } from "./constants";
 
 export interface QueryToolbarProps {
-  resultType: ResultViewType;
-  setResultType: (type: ResultViewType) => void;
+  resultType: QueryViewType;
+  setResultType: (type: QueryViewType) => void;
 }
 
 export function QueryToolbar({ resultType, setResultType }: QueryToolbarProps) {
