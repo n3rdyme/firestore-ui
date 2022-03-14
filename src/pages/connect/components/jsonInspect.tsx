@@ -9,22 +9,23 @@
 import React, { useEffect } from "react";
 import stringify from "json-stringify-pretty-compact";
 import Editor from "@monaco-editor/react";
-import { ParsedSQLResult } from "../../../hooks/useParsedSQL";
 import { useWindowWidth } from "../../../hooks/useWindowWidth";
 
-export function QueryInspect({ parsed }: { parsed: ParsedSQLResult }) {
+export function JsonInspect({ data }: { data: any }) {
   const fontSize = 12;
   const winSizeX = useWindowWidth();
 
   const [jsonText, setJsonText] = React.useState<string | undefined>();
   useEffect(() => {
     setJsonText(
-      stringify(parsed, {
-        indent: 2,
-        maxLength: Math.floor(winSizeX / (fontSize * 0.66)),
-      })
+      !data
+        ? ""
+        : stringify(data, {
+            indent: 2,
+            maxLength: Math.floor(winSizeX / (fontSize * 0.66)),
+          })
     );
-  }, [parsed, winSizeX]);
+  }, [data, winSizeX]);
 
   return (
     <div className="flex-grow flex flex-col text-xs font-mono whitespace-pre bg-light relative overflow-clip">

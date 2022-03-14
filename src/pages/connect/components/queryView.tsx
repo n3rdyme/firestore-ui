@@ -6,20 +6,26 @@
  * ****************************************************************************
  */
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Splitter } from "../../../components/splitter";
 import { useParsedSQL } from "../../../hooks/useParsedSQL";
 import { DefaultQuery, ResultViewType } from "./constants";
 import { QueryEdit } from "./queryEdit";
 import { QueryHelp } from "./queryHelp";
-import { QueryInspect } from "./queryInspect";
+import { JsonInspect } from "./jsonInspect";
 import { QueryRunner } from "./queryRunner";
 import { QueryToolbar } from "./queryToolbar";
 
 export function QueryView() {
   const [resultType, setResultType] = React.useState<ResultViewType>("none");
+  const [resultTime, setResultTime] = React.useState("");
   const [query, setQuery] = React.useState<string | undefined>(DefaultQuery);
   const parsed = useParsedSQL(query);
+
+  const onChangeResultType = useCallback((changeType: ResultViewType) => {
+    setResultType(changeType);
+    setResultTime(`${changeType}@${new Date().toISOString()}`);
+  }, []);
 
   return (
     <Splitter
@@ -27,15 +33,18 @@ export function QueryView() {
       defaultSize={180}
       top={
         <>
-          <QueryToolbar resultType={resultType} setResultType={setResultType} />
+          <QueryToolbar
+            resultType={resultType}
+            setResultType={onChangeResultType}
+          />
           <QueryEdit value={query} onChange={setQuery} errors={parsed.errors} />
         </>
       }
       bottom={
         {
           none: null,
-          inspect: <QueryInspect parsed={parsed} />,
-          run: <QueryRunner parsed={parsed} />,
+          inspect: <JsonInspect data={parsed} />,
+          run: <QueryRunner parsed={parsed} instanceKey={resultTime} />,
           help: <QueryHelp />,
         }[resultType]
       }

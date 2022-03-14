@@ -78,6 +78,7 @@ export interface SqlStatement {
 }
 
 export interface SqlStatementResult {
+  statement: SqlStatement;
   rows: any[];
   errors: any[];
   recordsAffected: number;

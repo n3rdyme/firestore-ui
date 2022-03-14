@@ -18,7 +18,9 @@ module.exports = {
         primary: "#ffcb2c",
         secondary: "#1a73e8",
         danger: "#881817",
-        navy: {          
+        success: "#28a745",
+        warning: "#ffc107",
+        navy: {
           10: "#f6f7f9",
           20: "#e5eaf0",
           30: "#d4dce7",

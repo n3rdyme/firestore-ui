@@ -12,6 +12,7 @@ import { classNames } from "../utils/classNames";
 export interface TabConfig {
   icon?: IconType;
   name: string;
+  color?: string;
   onClick: () => void;
 }
 
@@ -22,7 +23,6 @@ export interface TabsDisplayProps {
 
 const tabStyle = [
   "border-transparent",
-  "text-gray-500",
   "hover:text-secondary",
   "hover:border-secondary",
   "group",
@@ -43,8 +43,10 @@ export function TabsDisplay({ currentTab, tabs }: TabsDisplayProps) {
           <button
             type="button"
             key={tab.name}
-            className={classNames(tabStyle, {
-              "border-secondary text-secondary": index === currentTab,
+            className={classNames(tab.color ?? "text-gray-500", tabStyle, {
+              [tab.color ?? "text-gray-500"]: !(index === currentTab),
+              [tab.color ?? "text-secondary"]: index === currentTab,
+              "border-secondary": index === currentTab,
             })}
             aria-current={index === currentTab}
             onClick={tab.onClick}

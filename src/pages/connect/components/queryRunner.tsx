@@ -6,58 +6,71 @@
  * ****************************************************************************
  */
 
-import React, { useEffect, useState } from "react";
-import stringify from "json-stringify-pretty-compact";
-import Editor from "@monaco-editor/react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ParsedSQLResult } from "../../../hooks/useParsedSQL";
-import { useWindowWidth } from "../../../hooks/useWindowWidth";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { promiseParallel } from "../../../utils/promiseParallel";
 import { useStatementExecutor } from "../../../hooks/useStatementExecutor";
 import { ErrorMessage } from "../../../components/cardMessage";
+import { ProgressModal } from "../../../components/progressModal";
+import { ResultView } from "./resultView";
 
-export function QueryRunner({ parsed }: { parsed: ParsedSQLResult }) {
+export function QueryRunner({
+  parsed,
+  instanceKey: inputKey,
+}: {
+  parsed: ParsedSQLResult;
+  instanceKey: string;
+}) {
   const sqlExec = useStatementExecutor();
+  const [instanceKey, setInstanceKey] = useState(inputKey);
   const [error, setError] = React.useState<Error | null>(null);
   const [results, setResults] = React.useState<SqlStatementResult[]>([]);
-  const [run, setRun] = useState(true);
-  const fontSize = 12;
-  const winSizeX = useWindowWidth();
+  const [progress, setProgress] =
+    React.useState<{ count: number; total: number }>();
+  const cancelRequest = React.useRef({ cancel: false });
+  const [run, setRun] = useState("");
+
+  useEffect(() => setInstanceKey(inputKey), [inputKey]);
+
+  const onCancel = useCallback(() => {
+    cancelRequest.current.cancel = true;
+  }, []);
 
   useEffect(() => {
-    if (run) {
-      promiseParallel(parsed.statements, sqlExec, 1)
+    if (run !== instanceKey) {
+      setError(null);
+      setResults([]);
+      cancelRequest.current.cancel = false;
+      setProgress({ count: 0, total: parsed.statements.length });
+      setRun(instanceKey);
+
+      promiseParallel(
+        parsed.statements,
+        sqlExec,
+        1,
+        (count, total) => setProgress({ count, total }),
+        cancelRequest.current
+      )
         .then(setResults)
-        .catch(setError);
-      setRun(false);
+        .catch(setError)
+        .finally(() => setProgress(undefined));
     }
-  }, [run, parsed, sqlExec]);
-
-  const [jsonText, setJsonText] = React.useState<string | undefined>();
-  useEffect(() => {
-    setJsonText(
-      stringify(results, {
-        indent: 2,
-        maxLength: Math.floor(winSizeX / (fontSize * 0.66)),
-      })
-    );
-  }, [results, winSizeX]);
+  }, [run, instanceKey, parsed, sqlExec]);
 
   return (
     <div className="flex-grow flex flex-col">
+      <ProgressModal
+        inProgress={!!progress}
+        value={progress?.count ?? 0}
+        max={progress?.total ?? 0}
+        cancel={onCancel}
+        label={`Running ${
+          progress?.total === 1 ? "query" : `${progress?.total} queries`
+        }...`}
+      />
       {!!error && <ErrorMessage message={error.message} />}
-      <div className="flex-grow flex flex-col text-xs font-mono whitespace-pre bg-light relative overflow-clip">
-        <Editor
-          className="absolute top-0 left-0 right-0 bottom-0 border"
-          defaultLanguage="json"
-          options={{
-            minimap: { enabled: false },
-            readOnly: true,
-            fontSize,
-          }}
-          value={jsonText}
-        />
-      </div>
+      <ResultView results={results} />
     </div>
   );
 }
