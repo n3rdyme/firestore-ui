@@ -56,6 +56,7 @@
     "lint": "./node_modules/.bin/tsc --noEmit && ./node_modules/.bin/eslint ./src --ext .ts,.tsx,.js,.jsx",
     "jest": "CI=true react-scripts test --all",
     "test": "npm run lint && npm run jest",
+    "predeploy": "npm run test && npm run build",
     "deploy": "./node_modules/.bin/firebase deploy --only hosting"
   },
   "browserslist": {

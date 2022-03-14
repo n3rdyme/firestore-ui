@@ -54,7 +54,7 @@ const testSqlSyntax = [
   "update foo set bar = '123', abc = 456.789 order by bar limit 1",
   "update foo set bar = '123', abc = 456.789 where 1 <= 2 and 2 >= 3",
   "update foo set bar = '123', abc = 456.789 where 1 <= 2 and 2 >= 3 order by bar limit 1",
-  "insert into foo values ('123')",
+  // no longer allowed: "insert into foo values ('123')",
   "insert into foo set bar = '123'",
   "insert into foo set bar = '123', abc = 456.789",
   "insert into foo (bar) values ('123')",
