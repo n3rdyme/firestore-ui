@@ -14,15 +14,20 @@ export function useCollectionInsert() {
   const fs = useFirestore();
 
   return useCallback(
-    async (collectionName: string, id: string | undefined, data: any) => {
+    async (
+      collectionName: string,
+      identifiedBy: string | undefined,
+      data: any
+    ) => {
       if (!data) return undefined;
       if (!fs) throw new Error("Firestore is not initialized");
 
       const coll = collection(fs, collectionName);
 
-      if (id) {
+      if (identifiedBy) {
+        const id = `${data?.[identifiedBy] ?? ""}`;
         await setDoc(doc(coll, id), data);
-        return id;
+        return identifiedBy;
       }
 
       const docRef = await addDoc(coll, data);

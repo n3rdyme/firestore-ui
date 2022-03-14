@@ -13,6 +13,7 @@ import { DefaultQuery, ResultViewType } from "./constants";
 import { QueryEdit } from "./queryEdit";
 import { QueryHelp } from "./queryHelp";
 import { QueryInspect } from "./queryInspect";
+import { QueryRunner } from "./queryRunner";
 import { QueryToolbar } from "./queryToolbar";
 
 export function QueryView() {
@@ -34,7 +35,7 @@ export function QueryView() {
         {
           none: null,
           inspect: <QueryInspect parsed={parsed} />,
-          run: null,
+          run: <QueryRunner parsed={parsed} />,
           help: <QueryHelp />,
         }[resultType]
       }

@@ -17,12 +17,10 @@ import {
   SqlStatement,
   SqlTable,
   SqlValue,
+  DOTTED_ID_CHAR,
+  DOTTED_ID_SPLIT,
 } from "./sqlStatement";
 import { ExpressionNormalizer } from "./expressionNormalizer";
-
-// using this character to separate the names in multi-part names
-export const DOTTED_ID_CHAR = `\u0000`;
-export const DOTTED_ID_SPLIT = new RegExp(DOTTED_ID_CHAR, "g");
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
@@ -91,7 +89,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       }
       const { start, stop } = ctx;
       Object.assign(err, {
-        message: `${err.message}\nat ${syntaxTree}`,
+        message: `${err.message}`,
         startPos: start,
         endPos: stop,
         syntaxTree: syntaxTree || "-",
@@ -190,6 +188,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     if (ctx.columns) {
       statement.columns = this.visitFullColumnNameList(ctx.columns);
     }
+    if (ctx.identifier) {
+      statement.identifier = this.visitFullColumnName(ctx.identifier);
+    }
 
     // Object.assign(statement, ...this.visitChildren(ctx));
     if (ctx.values) {
@@ -198,6 +199,25 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       Object.assign(
         statement,
         this.visitInsertStatementSetValues(ctx.valueSet)
+      );
+    }
+
+    if (!statement.columns?.length) {
+      throw this.errorWithContext(
+        new Error(`No columns found in insert statement`),
+        ctx.columns || ctx
+      );
+    }
+    const unbalanced = statement.values?.find(
+      (v) => v?.length !== statement.columns?.length
+    );
+
+    if (unbalanced) {
+      throw this.errorWithContext(
+        new Error(
+          `Unbalanced values in insert statement, expected ${statement.columns.length} values, found ${unbalanced.length}.`
+        ),
+        ctx.values || ctx
       );
     }
 

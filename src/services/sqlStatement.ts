@@ -6,6 +6,10 @@
  * ****************************************************************************
  */
 
+// using this character to separate the names in multi-part names
+export const DOTTED_ID_CHAR = "\u0000";
+export const DOTTED_ID_SPLIT = new RegExp(DOTTED_ID_CHAR, "g");
+
 export interface IHaveName {
   name: string;
 }
@@ -64,10 +68,17 @@ export interface SqlStatement {
   type?: "select" | "insert" | "update" | "delete";
   table?: SqlTable[];
   columns?: SqlColumn[];
+  identifier?: string;
   values?: SqlValue[][];
   orderBy?: SqlOrder[];
   where?: string;
   query?: SqlNormalExpression;
   limit?: number;
   offset?: number;
+}
+
+export interface SqlStatementResult {
+  rows: any[];
+  errors: any[];
+  recordsAffected: number;
 }

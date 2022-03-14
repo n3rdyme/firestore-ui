@@ -47,7 +47,7 @@ sqlStatement
 
 insertStatement
     : INSERT
-      INTO? table=tableName
+      INTO? table=tableName (WITH KEY '=' identifier=fullColumnName)?
       (valueSet=insertStatementSetValues | values=insertStatementValues)
     ;
     
@@ -56,7 +56,7 @@ insertStatementSetValues
     ;
 
 insertStatementValues
-    : ('(' columns=fullColumnNameList ')')? values=insertStatementValue
+    : ('(' columns=fullColumnNameList ')') values=insertStatementValue
     ;
 
 insertStatementValue
