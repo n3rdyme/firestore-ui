@@ -80,6 +80,8 @@ export interface SqlStatement {
 export interface SqlStatementResult {
   statement: SqlStatement;
   rows: any[];
-  errors: any[];
+  errors: Array<Error & { rowIndex?: number }>;
   recordsAffected: number;
+  recordsFetched?: number;
+  timeTaken?: number;
 }

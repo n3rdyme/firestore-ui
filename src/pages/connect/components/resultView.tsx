@@ -52,7 +52,7 @@ export function ResultView({ results }: { results: SqlStatementResult[] }) {
   }, [resultsWithNames]);
 
   // Only one entry in results? don't show the tabs
-  if (resultsWithNames.length === 0) {
+  if (resultsWithNames.length <= 1) {
     return <ResultPanel results={results[0]} />;
   }
 

@@ -45,7 +45,7 @@ export function useSqlInsertExecutor() {
           })
           .catch((ex: unknown) => {
             (ex as any).rowIndex = result.rows.length - 1;
-            result.errors.push(ex);
+            result.errors.push(ex as any);
           });
       }
 

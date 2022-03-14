@@ -15,10 +15,17 @@ export function useStatementExecutor() {
 
   return useCallback(
     async (statement: SqlStatement): Promise<SqlStatementResult> => {
+      const startedAt = Date.now();
+      let result: SqlStatementResult;
+
       if (statement.type === "insert") {
-        return execInsert(statement);
+        result = await execInsert(statement);
+      } else {
+        throw new Error(`Unsupported statement type: ${statement.type}`);
       }
-      throw new Error(`Unsupported statement type: ${statement.type}`);
+
+      result.timeTaken = Date.now() - startedAt;
+      return result;
     },
     [execInsert]
   );

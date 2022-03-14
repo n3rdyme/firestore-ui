@@ -97,6 +97,31 @@
   section {
     @apply flex flex-col flex-grow p-4;
   }
+
+  table {
+    @apply bg-white border-collapse;
+  }
+
+  table thead {
+  }
+
+  table thead tr {
+  }
+
+  table thead th {
+    @apply bg-navy-50 border border-gray-50 uppercase text-left text-xs m-0 py-1 px-0 leading-tight max-w-64 truncate;
+  }
+
+  table tbody {
+  }
+
+  table tbody tr {
+    @apply even:bg-gray-50;
+  }
+
+  table tbody tr td {
+    @apply border border-gray-100 text-sm m-0 py-1 px-0 leading-tight max-w-64;
+  }
 }
 
 @tailwind components;
