@@ -11,7 +11,7 @@ export type QueryViewType = "none" | "run" | "inspect" | "help";
 export type ResultViewType = "table" | "json" | "inspect";
 
 export const DefaultQuery = `/* Enter your sql query here */
-SELECT Make_Name, Model_Name
+SELECT "Make_Name" as Make, "Model_Name" as Model
   FROM Models
   WHERE Model_Name >= 'FIREBLADE' 
   ORDER BY Model_Name

@@ -51,8 +51,8 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
                 <th className="w-1 px-3 bg-navy-50 text-right">
                   <div className="">#</div>
                 </th>
-                {columns.map((c) => (
-                  <TableHeading key={c} title={c} />
+                {results.columns.map((c) => (
+                  <TableHeading key={c.value} column={c} />
                 ))}
                 <th className="w-1/2 border">&nbsp;</th>
               </tr>

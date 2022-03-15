@@ -7,12 +7,16 @@
  */
 
 import React from "react";
+import { SqlFieldValue } from "../../../services/sqlFieldValue";
+import { SqlColumn } from "../../../services/sqlStatement";
 
 export interface TableHeadingProps {
-  title: string;
+  column: SqlColumn;
 }
 
-export function TableHeading({ title }: TableHeadingProps) {
+export function TableHeading({ column }: TableHeadingProps) {
+  const col = new SqlFieldValue(column);
+  const title = col.aliasName ?? col.fqFieldName;
   return (
     <th>
       <div className="px-3">{title}</div>

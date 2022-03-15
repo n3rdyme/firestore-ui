@@ -17,7 +17,7 @@ export class SqlFieldValue {
     return this.data.type === "column";
   }
 
-  public get displayName(): string {
+  public get aliasName(): string | undefined {
     if (!this.isField) {
       throw new Error("The field references a value, not a column.");
     }
@@ -26,9 +26,7 @@ export class SqlFieldValue {
     if (alias) {
       return alias;
     }
-
-    const parts = this.data.value.split(DOTTED_ID_SPLIT);
-    return parts[parts.length - 1];
+    return undefined;
   }
 
   public get fqFieldName(): string {
