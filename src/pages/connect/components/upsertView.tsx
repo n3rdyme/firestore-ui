@@ -86,7 +86,7 @@ export function UpsertView() {
         return;
       }
 
-      console.log(`Uploading ${jsonData.length} items to ${collectionName}`);
+      console.info(`Uploading ${jsonData.length} items to ${collectionName}`);
       cancelRequest.current.cancel = false;
       setProgress({ count: 0, total: jsonData.length });
       setUploading(true);

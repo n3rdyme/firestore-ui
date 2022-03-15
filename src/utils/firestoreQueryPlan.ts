@@ -24,6 +24,7 @@ import _ from "lodash";
 import { sqlComparisonTable } from "../services/sqlComparisons";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 import {
+  SqlColumn,
   SqlNormalExpression,
   SqlNormalizedAnd,
   SqlOrder,
@@ -80,7 +81,7 @@ export class FirestoreQueryPlan {
         console.warn(`Operator not implemented ${exp.op}`);
         return false;
       }
-      const data = doc.data();
+      const data = { $id: doc.id, ...doc.data() };
       const rhs = !exp.right
         ? undefined
         : new SqlFieldValue(exp.right).getValue(data);
@@ -106,7 +107,32 @@ export class FirestoreQueryPlan {
     statement: SqlStatement,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
-    return dataset;
+    const { orderBy: orderByFields } = statement;
+    if (!orderByFields?.length) {
+      return dataset;
+    }
+
+    return dataset.sort((a, b) => {
+      const docA = { $id: a.id, ...a.data() };
+      const docB = { $id: b.id, ...b.data() };
+
+      for (const { name, order } of orderByFields) {
+        const col: SqlColumn = { type: "column", value: name };
+        const valueA = new SqlFieldValue(col).getValue(docA);
+        const valueB = new SqlFieldValue(col).getValue(docB);
+
+        if (sqlComparisonTable["<"].compare(valueA, valueB)) {
+          if (order === "desc") return 1;
+          return -1;
+        }
+        if (!sqlComparisonTable["="].compare(valueA, valueB)) {
+          if (order === "desc") return -1;
+          return 1;
+        }
+      }
+
+      return 0;
+    });
   }
 
   async getDocuments(

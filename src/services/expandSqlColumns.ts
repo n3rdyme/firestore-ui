@@ -29,7 +29,7 @@ export function expandSqlColumns(
         dataset = dataset.map((row) => colVal.getValue(row));
       }
       for (const name of _.uniq(
-        _.flatten(dataset.map((r) => Object.keys(r ?? {})))
+        _.flatten(dataset.map((r) => Object.keys(r ?? {}).sort()))
       )) {
         if (!seen.has(name)) {
           seen.add(name);
