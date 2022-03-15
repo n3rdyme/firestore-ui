@@ -20,7 +20,6 @@ import {
   CollectionReference,
   QueryDocumentSnapshot,
 } from "firebase/firestore";
-import _ from "lodash";
 import { sqlComparisonTable } from "../services/sqlComparisons";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 import {
