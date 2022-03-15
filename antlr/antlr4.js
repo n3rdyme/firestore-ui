@@ -20,7 +20,6 @@ const cmd = [
   grammars,
 ].join(" ");
 
-// console.log(cmd);
 exec(cmd, (err) => {
   if (err) {
     console.error(err);

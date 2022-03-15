@@ -101,7 +101,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   visitChildren(ctx: ParserRuleContext) {
     try {
-      // console.log({ enter: ctx.getText() });
+      // console.debug({ enter: ctx.getText() });
       return SqlParserVisitor.prototype.visitChildren.call(this, ctx);
     } catch (e: unknown) {
       throw this.errorWithContext(e as any, ctx);

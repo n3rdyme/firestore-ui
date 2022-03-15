@@ -88,10 +88,7 @@ export class FirestoreQueryPlan {
         ? undefined
         : new SqlFieldValue(exp.left).getValue(data);
 
-      if (op.compare(lhs, rhs)) {
-        console.log(`${lhs} ${exp.op} ${rhs} = true`);
-      }
-
+      // console.debug(`${lhs} ${exp.op} ${rhs} = ${op.compare(lhs, rhs)}`);
       return op.compare(lhs, rhs) === true;
     };
 
@@ -245,7 +242,7 @@ export class FirestoreQueryPlan {
         .map((c) => {
           const lhs = new SqlFieldValue(c.left!);
           const rhs = new SqlFieldValue(c.right!);
-          // console.log("where", [lhs.fqFieldName, "==", rhs.value]);
+          // console.debug("where", [lhs.fqFieldName, "==", rhs.value]);
           return where(lhs.fqFieldName, "==", rhs.value);
         });
     }
@@ -261,7 +258,7 @@ export class FirestoreQueryPlan {
       ) {
         const lhs = new SqlFieldValue(c.left!);
         const rhs = new SqlFieldValue(c.right!);
-        // console.log("where", [lhs.fqFieldName, "==", rhs.value]);
+        // console.debug("where", [lhs.fqFieldName, "==", rhs.value]);
         const op = c.op === "=" ? "==" : c.op;
         return [where(lhs.fqFieldName, op as any, rhs.value)];
       }

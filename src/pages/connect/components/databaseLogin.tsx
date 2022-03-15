@@ -32,10 +32,10 @@ export function DatabaseLogin() {
       e.preventDefault();
       setWorking(true);
       setError(null);
-      console.log("loginEmail", email, password);
+      console.info("loginEmail", email, password);
       auth
         ?.login("email", { email, password })
-        .then(() => console.log("Login complete"))
+        .then(() => console.info("Login complete"))
         .catch(setError)
         .finally(() => setWorking(false));
     },
@@ -47,7 +47,7 @@ export function DatabaseLogin() {
     setError(null);
     auth
       ?.login("google")
-      .then(() => console.log("Login complete"))
+      .then(() => console.info("Login complete"))
       .catch(setError)
       .finally(() => setWorking(false));
   }, [auth]);
