@@ -20,7 +20,7 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
     () =>
       !results?.columns
         ? Object.keys(results?.rows[0] ?? {})
-        : results.columns.map((c) => new SqlFieldValue(c).displayName),
+        : results.columns.map((c) => new SqlFieldValue(c).fqFieldName),
     [results]
   );
 

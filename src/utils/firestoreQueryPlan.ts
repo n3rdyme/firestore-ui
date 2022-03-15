@@ -21,10 +21,13 @@ import {
   QueryDocumentSnapshot,
 } from "firebase/firestore";
 import _ from "lodash";
+import { sqlComparisonTable } from "../services/sqlComparisons";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 import {
   SqlNormalExpression,
+  SqlNormalizedAnd,
   SqlOrder,
+  SqlPredicate,
   SqlStatement,
 } from "../services/sqlStatement";
 import { promiseParallel } from "./promiseParallel";
@@ -32,8 +35,14 @@ import { promiseParallel } from "./promiseParallel";
 export class FirestoreQueryPlan {
   private collection: CollectionReference<DocumentData>;
 
+  private totalRecords = 0;
+
   constructor(private readonly fs: Firestore, readonly collectionName: string) {
     this.collection = collection(this.fs, collectionName);
+  }
+
+  public get recordsScanned() {
+    return this.totalRecords;
   }
 
   public async execute(statement: SqlStatement) {
@@ -59,7 +68,38 @@ export class FirestoreQueryPlan {
     statement: SqlStatement,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
-    return dataset;
+    const { query: criteria } = statement;
+
+    if (!criteria || criteria.or.length === 0) {
+      return dataset;
+    }
+
+    const testGate = (exp: SqlPredicate, doc: any) => {
+      const op = sqlComparisonTable[exp.op ?? "??????"];
+      if (!op) {
+        console.warn(`Operator not implemented ${exp.op}`);
+        return false;
+      }
+      const data = doc.data();
+      const rhs = !exp.right
+        ? undefined
+        : new SqlFieldValue(exp.right).getValue(data);
+      const lhs = !exp.left
+        ? undefined
+        : new SqlFieldValue(exp.left).getValue(data);
+
+      return op.compare(lhs, rhs);
+    };
+
+    const testAnd = (exp: SqlPredicate[], doc: any) => {
+      return exp.every((e) => testGate(e, doc));
+    };
+
+    const testOr = (exp: SqlNormalizedAnd[], doc: any) => {
+      return exp.some((e) => testAnd(e.and, doc));
+    };
+
+    return dataset.filter((doc: any) => testOr(criteria.or, doc));
   }
 
   orderedResults(
@@ -98,7 +138,7 @@ export class FirestoreQueryPlan {
 
     // Otherwise, we can use a single query
     const constraints = [
-      ...this.getQuery(statement.query),
+      ...this.getQuery(statement),
       ...this.getOrderBy(statement.query, statement.orderBy),
       ...this.getLimits(statement),
     ];
@@ -106,6 +146,7 @@ export class FirestoreQueryPlan {
     const q = query(this.collection, ...constraints);
     const documents = await getDocs(q);
 
+    this.totalRecords += documents.size;
     const results = documents.docs;
     return results;
   }
@@ -148,7 +189,17 @@ export class FirestoreQueryPlan {
     return plans;
   }
 
-  private getQuery(criteria: SqlStatement["query"]): QueryConstraint[] {
+  private getQuery(statement: SqlStatement): QueryConstraint[] {
+    const { query: criteria } = statement;
+
+    // console.info(
+    //   `Query ${JSON.stringify(statement.table?.[0].name)} for ${JSON.stringify(
+    //     criteria?.or?.[0]?.and.map(
+    //       ({ left, op, right }) => `${left?.value} ${op} ${right?.value}`
+    //     )
+    //   )}`
+    // );
+
     if (!criteria || criteria.or.length === 0) {
       return [];
     }
@@ -169,6 +220,24 @@ export class FirestoreQueryPlan {
           return where(lhs.fqFieldName, "==", rhs.value);
         });
     }
+
+    if (criteria.or[0].and.length === 1) {
+      const c = criteria.or[0].and[0];
+      if (
+        c.left &&
+        c.right &&
+        c.left.type === "column" &&
+        c.right?.type !== "column" &&
+        sqlComparisonTable[c.op ?? "??????"]
+      ) {
+        const lhs = new SqlFieldValue(c.left!);
+        const rhs = new SqlFieldValue(c.right!);
+        // console.log("where", [lhs.fqFieldName, "==", rhs.value]);
+        const op = c.op === "=" ? "==" : c.op;
+        return [where(lhs.fqFieldName, op as any, rhs.value)];
+      }
+    }
+
     return [];
   }
 

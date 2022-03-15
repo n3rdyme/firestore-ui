@@ -53,7 +53,10 @@ export function QueryRunner({
         cancelRequest.current
       )
         .then(setResults)
-        .catch(setError)
+        .catch((ex) => {
+          setError(ex);
+          console.error(ex);
+        })
         .finally(() => setProgress(undefined));
     }
   }, [run, instanceKey, parsed, sqlExec]);

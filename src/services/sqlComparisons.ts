@@ -50,6 +50,11 @@ export const sqlComparisonTable: ComparisonTable = {
     reorder: "=",
     compare: coerceTypeCompare((a: any, b: any) => a === b),
   },
+  "!=": {
+    invert: "=",
+    reorder: "!=",
+    compare: coerceTypeCompare((a: any, b: any) => a !== b),
+  },
   ">": {
     invert: "<=",
     reorder: "<",
@@ -69,10 +74,5 @@ export const sqlComparisonTable: ComparisonTable = {
     invert: "<",
     reorder: "<=",
     compare: coerceTypeCompare((a: any, b: any) => a >= b),
-  },
-  "!=": {
-    invert: "=",
-    reorder: "!=",
-    compare: coerceTypeCompare((a: any, b: any) => a !== b),
   },
 };

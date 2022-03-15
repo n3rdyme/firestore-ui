@@ -31,6 +31,6 @@ export function useStatementExecutor() {
       result.timeTaken = Date.now() - startedAt;
       return result;
     },
-    [execInsert]
+    [execInsert, execSelect]
   );
 }
