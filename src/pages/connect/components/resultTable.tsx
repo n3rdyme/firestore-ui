@@ -38,41 +38,47 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
   );
 
   return (
-    <div className="flex flex-grow flex-col overflow-scroll">
+    <div className="flex flex-grow flex-col">
       {unknownErrors?.length > 0 &&
         unknownErrors.map((e) => (
           <ErrorMessage message={e.message} key={e.toString()} />
         ))}
-      <table className="w-full">
-        <thead>
-          <tr>
-            <th className="w-1 px-3 bg-navy-50 text-right">#</th>
-            {columns.map((c) => (
-              <TableHeading key={c} title={c} />
-            ))}
-            <th className="w-1/2">&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          {results.rows?.map((row, index) => (
-            <tr
-              key={row.$id ?? index}
-              className={classNames({ "bg-red-100": !!rowToError[index] })}
-            >
-              <td className="px-3 bg-navy-50 text-right">{index + 1}</td>
-              {(results.columns ?? []).map((c) => (
-                <TableData key={c.value} row={row} column={c} />
+      <div className="flex flex-grow flex-col relative">
+        <div className="absolute overflow-scroll top-0 left-0 bottom-0 right-0">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-white">
+              <tr>
+                <th className="w-1 px-3 bg-navy-50 text-right">
+                  <div className="">#</div>
+                </th>
+                {columns.map((c) => (
+                  <TableHeading key={c} title={c} />
+                ))}
+                <th className="w-1/2 border">&nbsp;</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.rows?.map((row, index) => (
+                <tr
+                  key={row.$id ?? index}
+                  className={classNames({ "bg-red-100": !!rowToError[index] })}
+                >
+                  <td className="px-3 bg-navy-50 text-right">{index + 1}</td>
+                  {(results.columns ?? []).map((c) => (
+                    <TableData key={c.value} row={row} column={c} />
+                  ))}
+                  {!!rowToError[index] && (
+                    <td className="w-full px-3 text-danger flex flex-nowrap items-center whitespace-nowrap max-w-none">
+                      <FaExclamationTriangle className="mr-2" />
+                      {rowToError[index]?.message}
+                    </td>
+                  )}
+                </tr>
               ))}
-              {!!rowToError[index] && (
-                <td className="w-full px-3 text-danger flex flex-nowrap items-center whitespace-nowrap max-w-none">
-                  <FaExclamationTriangle className="mr-2" />
-                  {rowToError[index]?.message}
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

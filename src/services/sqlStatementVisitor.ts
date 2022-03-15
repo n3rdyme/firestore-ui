@@ -493,9 +493,18 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#stringLiteral.
   override visitStringLiteral(ctx: ParserRuleContext) {
+    const text = ctx.getText();
+    const stringValue = text
+      .substring(1, text.length - 1)
+      .replace(/(""|\\.)/g, (txt) => {
+        if (txt === '""') {
+          return '"';
+        }
+        return this.unescapeChar(txt[1]);
+      });
     const value: SqlValue = {
       type: "string",
-      value: ctx.getText(),
+      value: stringValue,
     };
     return value;
   }

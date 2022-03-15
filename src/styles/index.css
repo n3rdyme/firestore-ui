@@ -109,7 +109,7 @@
   }
 
   table thead th {
-    @apply bg-navy-50 border border-gray-50 text-left text-xs m-0 py-1 px-0 leading-tight max-w-64 truncate;
+    @apply bg-navy-50 border border-gray-50 text-left text-xs m-0 py-1 px-0 leading-tight max-w-64;
   }
 
   table tbody {

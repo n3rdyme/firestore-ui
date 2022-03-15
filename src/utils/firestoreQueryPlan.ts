@@ -88,7 +88,11 @@ export class FirestoreQueryPlan {
         ? undefined
         : new SqlFieldValue(exp.left).getValue(data);
 
-      return op.compare(lhs, rhs);
+      if (op.compare(lhs, rhs)) {
+        console.log(`${lhs} ${exp.op} ${rhs} = true`);
+      }
+
+      return op.compare(lhs, rhs) === true;
     };
 
     const testAnd = (exp: SqlPredicate[], doc: any) => {
