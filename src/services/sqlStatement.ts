@@ -6,6 +6,8 @@
  * ****************************************************************************
  */
 
+import { SqlComparisonType } from "./sqlComparisons";
+
 // using this character to separate the names in multi-part names
 export const DOTTED_ID_CHAR = "\u0000";
 export const DOTTED_ID_SPLIT = new RegExp(DOTTED_ID_CHAR, "g");
@@ -46,7 +48,7 @@ export interface SqlValue {
 export interface SqlPredicate {
   not?: boolean;
   left?: SqlColumn | SqlValue;
-  op?: "=" | "!=" | ">" | "<" | ">=" | "<=" | "like" | "rlike" | "regex";
+  op?: SqlComparisonType;
   right?: SqlColumn | SqlValue;
 }
 
@@ -56,6 +58,7 @@ export interface SqlNormalizedAnd {
 
 export interface SqlNormalExpression {
   or: SqlNormalizedAnd[];
+  common?: SqlPredicate[];
 }
 
 export interface SqlExpression {
@@ -79,6 +82,7 @@ export interface SqlStatement {
 
 export interface SqlStatementResult {
   statement: SqlStatement;
+  columns: SqlColumn[];
   rows: any[];
   errors: Array<Error & { rowIndex?: number }>;
   recordsAffected: number;

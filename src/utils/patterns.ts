@@ -8,6 +8,8 @@
 
 class RegexPatters {
   readonly isoDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/;
+
+  readonly digitsOnly = /^\d+$/;
 }
 
 export const patterns = new RegexPatters();

@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-assign */
 /* eslint-disable no-plusplus */
 /*
  * ****************************************************************************
@@ -6,19 +7,24 @@
  * Created On: March 12th, 2022
  * ****************************************************************************
  */
-
-import { SqlExpression, SqlPredicate } from "./sqlStatement";
+import { isEqual } from "lodash";
+import { sqlComparisonTable } from "./sqlComparisons";
+import {
+  SqlExpression,
+  SqlNormalExpression,
+  SqlPredicate,
+} from "./sqlStatement";
 
 type TreeNode = SqlExpression & SqlPredicate;
 
-export interface SqlNormalizedAnd {
-  and: SqlPredicate[];
-}
-
-export interface SqlNormalExpression {
-  or: SqlNormalizedAnd[];
-}
-
+/**
+ * Normalizes an expression tree.
+ *
+ * @note This is not a very efficient implementation, but I don't expect it to
+ * be used with 100's or 1000's of operands. This is primarily intended for
+ * users writing queries in the browser based UI. If you need to normalize
+ * a large number of expressions, you should consider refactoring this code.
+ */
 export class ExpressionNormalizer {
   public normalize(
     expression: SqlExpression & SqlPredicate
@@ -34,7 +40,18 @@ export class ExpressionNormalizer {
     // 3. Then, flatten all expressions
     const flattened = this.flattenTree(normalized);
 
-    return this.normalizeExpression(flattened);
+    // 4. Normalize the expression tree to or [ and [ ... ] ]
+    const normalTree = this.normalizeExpression(flattened);
+
+    // 5. Swap all nots for the opposite operator
+    const results = this.normalizePredicateLogic(normalTree);
+
+    const commonEquality = this.commonEqualityPredicates(results);
+    if (commonEquality.length) {
+      results.common = commonEquality;
+    }
+
+    return results;
   }
 
   private pushNegatedExpressions(root: TreeNode): TreeNode {
@@ -75,9 +92,10 @@ export class ExpressionNormalizer {
         if (!found2?.or) {
           throw new Error("Invariant: Should be the same object tree.");
         }
-        found.or.shift();
+        const [first, ...remaining] = found.or;
+        found.or = [first];
         todo.push(copy);
-        found2.or.pop();
+        found2.or = remaining;
         todo.push(copy2);
       }
 
@@ -174,5 +192,59 @@ export class ExpressionNormalizer {
     }
 
     return normalized as SqlNormalExpression;
+  }
+
+  private normalizePredicateLogic(
+    expression: SqlNormalExpression
+  ): SqlNormalExpression {
+    for (const andGate of expression.or) {
+      for (const predicate of andGate.and) {
+        // remove the `not` operation if we can
+        let { op } = predicate;
+        if (!op) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        if (predicate.not && sqlComparisonTable[op]?.invert) {
+          delete predicate.not;
+          predicate.op = op = sqlComparisonTable[op].invert;
+        }
+        // if the predicate is lhs=const, rhs=column, swap them
+        if (
+          predicate.left?.type !== "column" &&
+          predicate.right?.type === "column" &&
+          sqlComparisonTable[op]?.reorder
+        ) {
+          const { left, right } = predicate;
+          predicate.left = right;
+          predicate.right = left;
+          predicate.op = op = sqlComparisonTable[op].reorder;
+        }
+      }
+    }
+
+    return expression;
+  }
+
+  private commonEqualityPredicates(expression: SqlNormalExpression) {
+    let found: SqlPredicate[] = expression.or[0]?.and?.filter(
+      (cmp) => cmp.op === "="
+    );
+
+    for (const andGate of [...expression.or].slice(1)) {
+      for (const predicate of found) {
+        const wasFound = !!andGate.and.find((cmp) => isEqual(predicate, cmp));
+        if (!wasFound) {
+          found = found.filter((cmp) => cmp !== predicate);
+        }
+      }
+
+      if (!found.length) {
+        break;
+      }
+    }
+
+    return found;
   }
 }

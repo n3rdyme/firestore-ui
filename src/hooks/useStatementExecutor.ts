@@ -9,9 +9,11 @@
 import { useCallback } from "react";
 import { SqlStatement, SqlStatementResult } from "../services/sqlStatement";
 import { useSqlInsertExecutor } from "./useSqlInsertExecutor";
+import { useSqlSelectExecutor } from "./useSqSelectExecutor";
 
 export function useStatementExecutor() {
   const execInsert = useSqlInsertExecutor();
+  const execSelect = useSqlSelectExecutor();
 
   return useCallback(
     async (statement: SqlStatement): Promise<SqlStatementResult> => {
@@ -20,6 +22,8 @@ export function useStatementExecutor() {
 
       if (statement.type === "insert") {
         result = await execInsert(statement);
+      } else if (statement.type === "select") {
+        result = await execSelect(statement);
       } else {
         throw new Error(`Unsupported statement type: ${statement.type}`);
       }

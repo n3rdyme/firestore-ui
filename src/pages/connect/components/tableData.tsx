@@ -7,16 +7,18 @@
  */
 
 import React from "react";
+import { SqlFieldValue } from "../../../services/sqlFieldValue";
+import { SqlValue } from "../../../services/sqlStatement";
 import { classNames } from "../../../utils/classNames";
 import { patterns } from "../../../utils/patterns";
 
 export interface TableDataProps {
   row: any;
-  column: string;
+  column: SqlValue;
 }
 
 export function TableData({ row, column }: TableDataProps) {
-  let value = row[column];
+  let value = new SqlFieldValue(column).getValue(row);
   let align: "text-left" | "text-right" = "text-left";
   let color: string | undefined;
   let width = "w-8";

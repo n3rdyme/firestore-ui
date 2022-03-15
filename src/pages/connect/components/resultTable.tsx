@@ -9,6 +9,7 @@
 import React, { useMemo } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ErrorMessage } from "../../../components/cardMessage";
+import { SqlFieldValue } from "../../../services/sqlFieldValue";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { classNames } from "../../../utils/classNames";
 import { TableData } from "./tableData";
@@ -17,9 +18,9 @@ import { TableHeading } from "./tableHeading";
 export function ResultTable({ results }: { results: SqlStatementResult }) {
   const columns = useMemo(
     () =>
-      !results?.statement.columns
+      !results?.columns
         ? Object.keys(results?.rows[0] ?? {})
-        : results.statement.columns.map((c) => c.value),
+        : results.columns.map((c) => new SqlFieldValue(c).displayName),
     [results]
   );
 
@@ -59,8 +60,8 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
               className={classNames({ "bg-red-100": !!rowToError[index] })}
             >
               <td className="px-3 bg-navy-50 text-right">{index + 1}</td>
-              {columns.map((c) => (
-                <TableData key={c} row={row} column={c} />
+              {(results.columns ?? []).map((c) => (
+                <TableData key={c.value} row={row} column={c} />
               ))}
               {!!rowToError[index] && (
                 <td className="w-full px-3 text-danger flex flex-nowrap items-center whitespace-nowrap max-w-none">

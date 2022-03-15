@@ -21,6 +21,7 @@ import {
   DOTTED_ID_SPLIT,
 } from "./sqlStatement";
 import { ExpressionNormalizer } from "./expressionNormalizer";
+import { mapSynonymOperations } from "./sqlComparisons";
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
@@ -342,7 +343,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   override visitFromClause(ctx: ParserRuleContext) {
     const [, from, , where] = this.visitChildren(ctx);
     return {
-      from: Array.isArray(from) ? from : [from],
+      table: Array.isArray(from) ? from : [from],
       where,
     };
   }
@@ -622,7 +623,8 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#binaryComparisonPredicate.
   override visitBinaryComparisonPredicate(ctx: ParserRuleContext) {
-    const [left, op, right] = this.visitChildren(ctx);
+    const [left, operation, right] = this.visitChildren(ctx);
+    const op = mapSynonymOperations(operation);
     const predicate: SqlPredicate = { left, op, right };
     return predicate;
   }

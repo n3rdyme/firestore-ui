@@ -276,7 +276,8 @@ expressionAtom
 
 comparisonOperator
     : '=' | '>' | '<' | '<' '=' | '>' '='
-    | '<' '>' | '!' '=' | '<' '=' '>'
+    | '<' '>' | '!' '=' 
+    // Nope this | '<' '=' '>'
     ;
 
 logicalOperator

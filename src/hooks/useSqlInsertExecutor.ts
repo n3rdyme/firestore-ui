@@ -30,6 +30,7 @@ export function useSqlInsertExecutor() {
 
       const result: SqlStatementResult = {
         statement,
+        columns,
         rows: [],
         errors: [],
         recordsAffected: 0,
