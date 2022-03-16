@@ -6,8 +6,7 @@
  * ****************************************************************************
  */
 
-import numeral from "numeral";
-import React, { useMemo } from "react";
+import React from "react";
 import { Spinner } from "../../../components/spinner";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { ResultViewType } from "./constants";

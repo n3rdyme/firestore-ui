@@ -2,17 +2,10 @@
  * ****************************************************************************
  * Copyright (C) 2022-2022 - All rights reserved.
  * Project: firestore-ui
- * Created On: March 15th, 2022
- * ****************************************************************************
- */
-/* eslint-disable no-plusplus */
-/*
- * ****************************************************************************
- * Copyright (C) 2022-2022 - All rights reserved.
- * Project: firestore-ui
  * Created On: March 14th, 2022
  * ****************************************************************************
  */
+/* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 
@@ -24,7 +17,6 @@ import { useFirestore } from "../services/firebaseApp";
 import { FirestoreQueryPlan } from "../utils/firestoreQueryPlan";
 import { expandSqlColumns } from "../services/expandSqlColumns";
 import { promiseParallel } from "../utils/promiseParallel";
-import { SqlFieldValue } from "../services/sqlFieldValue";
 
 export function useSqlDeleteExecutor() {
   const fs = useFirestore();
@@ -37,7 +29,7 @@ export function useSqlDeleteExecutor() {
         throw new Error("Expected delete statement");
       }
 
-      const { table, columns, values } = statement;
+      const { table } = statement;
       if (!table?.[0].name) {
         console.error("Invalid statement", statement);
         throw new Error("Expected delete with table.");
