@@ -1,3 +1,10 @@
+/*
+ * ****************************************************************************
+ * Copyright (C) 2022-2022 - All rights reserved.
+ * Project: firestore-ui
+ * Created On: March 15th, 2022
+ * ****************************************************************************
+ */
 /* eslint-disable no-plusplus */
 /*
  * ****************************************************************************
@@ -10,7 +17,7 @@
 /* eslint-disable no-await-in-loop */
 
 import { useCallback } from "react";
-import { updateDoc } from "firebase/firestore";
+import { deleteDoc } from "firebase/firestore";
 
 import { SqlStatement, SqlStatementResult } from "../services/sqlStatement";
 import { useFirestore } from "../services/firebaseApp";
@@ -19,31 +26,26 @@ import { expandSqlColumns } from "../services/expandSqlColumns";
 import { promiseParallel } from "../utils/promiseParallel";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 
-export function useSqlUpdateExecutor() {
+export function useSqlDeleteExecutor() {
   const fs = useFirestore();
   return useCallback(
     async (statement: SqlStatement): Promise<SqlStatementResult> => {
       if (!fs) {
         throw new Error("Firestore is not initialized.");
       }
-      if (statement.type !== "update") {
-        throw new Error("Expected update statement");
+      if (statement.type !== "delete") {
+        throw new Error("Expected delete statement");
       }
 
       const { table, columns, values } = statement;
-      if (
-        !table?.[0].name ||
-        !columns?.length ||
-        values?.length !== 1 ||
-        columns.length !== values[0].length
-      ) {
+      if (!table?.[0].name) {
         console.error("Invalid statement", statement);
-        throw new Error("Expected update with table and columns to set.");
+        throw new Error("Expected delete with table.");
       }
 
       const result: SqlStatementResult = {
         statement,
-        columns,
+        columns: [{ type: "column", value: "*", star: true }],
         rows: [],
         errors: [],
         recordsAffected: 0,
@@ -59,16 +61,9 @@ export function useSqlUpdateExecutor() {
           const data = doc.data();
 
           try {
-            for (let ix = 0; ix < columns.length; ix++) {
-              const lhs = new SqlFieldValue(columns[ix]);
-              const rhs = new SqlFieldValue(values[0][ix]);
-              // console.debug({ lhs, rhs, value: rhs.getValue(data) });
-              lhs.setValue(data, rhs.getValue(data));
-            }
-
-            await updateDoc(doc.ref, data);
+            await deleteDoc(doc.ref);
           } catch (e: unknown) {
-            console.error(e, { data, columns, values: values[0] });
+            console.error(e, { rowIndex, data });
             (e as any).rowIndex = rowIndex;
             result.errors.push(e as any);
           }
