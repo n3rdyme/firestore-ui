@@ -9,21 +9,12 @@
 import React, { useMemo } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ErrorMessage } from "../../../components/cardMessage";
-import { SqlFieldValue } from "../../../services/sqlFieldValue";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { classNames } from "../../../utils/classNames";
 import { TableData } from "./tableData";
 import { TableHeading } from "./tableHeading";
 
 export function ResultTable({ results }: { results: SqlStatementResult }) {
-  const columns = useMemo(
-    () =>
-      !results?.columns
-        ? Object.keys(results?.rows[0] ?? {})
-        : results.columns.map((c) => new SqlFieldValue(c).fqFieldName),
-    [results]
-  );
-
   const { unknownErrors, rowToError } = useMemo(
     () => ({
       unknownErrors: results?.errors?.filter((e) => e.rowIndex == null),
