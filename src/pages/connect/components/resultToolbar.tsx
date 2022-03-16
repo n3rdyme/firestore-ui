@@ -6,9 +6,13 @@
  * ****************************************************************************
  */
 
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { BsZoomIn } from "react-icons/bs";
 import { FaCode, FaTable } from "react-icons/fa";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+} from "../../../components/dropdownMenu";
 import { ResultViewType } from "./constants";
 import { ResultTitle, ResultTitleProps } from "./resultTitle";
 
@@ -32,18 +36,22 @@ export function ResultToolbar({
   );
   const onViewJson = useCallback(() => setResultType("json"), [setResultType]);
 
+  const menuItems: (DropdownMenuItem & { id: string })[] = useMemo(
+    () => [
+      { id: "table", icon: FaTable, name: "Data Table", onClick: onViewTable },
+      { id: "json", icon: FaCode, name: "JSON Data", onClick: onViewJson },
+      { id: "inspect", icon: BsZoomIn, name: "Inspect", onClick: onInspect },
+    ],
+    [onViewTable, onViewJson, onInspect]
+  );
+
   return (
     <ResultTitle onClose={onClose}>
       <div className="flex flex-row flex-nowrap space-x-2 text-dark">
-        <button type="button" className="bg-light py-1" onClick={onViewTable}>
-          <FaTable className="mr-1" /> Data Table
-        </button>
-        <button type="button" className="bg-light py-1" onClick={onViewJson}>
-          <FaCode className="mr-1" /> JSON Data
-        </button>
-        <button type="button" className="bg-light py-1" onClick={onInspect}>
-          <BsZoomIn className="mr-1" /> Inspect
-        </button>
+        <DropdownMenu
+          currentItem={menuItems.findIndex((x) => x.id === resultType)}
+          items={menuItems}
+        />
       </div>
     </ResultTitle>
   );
