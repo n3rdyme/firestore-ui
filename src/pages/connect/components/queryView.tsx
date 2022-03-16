@@ -15,17 +15,21 @@ import { QueryHelp } from "./queryHelp";
 import { JsonInspect } from "./jsonInspect";
 import { QueryRunner } from "./queryRunner";
 import { QueryToolbar } from "./queryToolbar";
+import { ResultTitle } from "./resultTitle";
 
 export function QueryView() {
   const [resultType, setResultType] = React.useState<QueryViewType>("none");
   const [resultTime, setResultTime] = React.useState("");
   const [query, setQuery] = React.useState<string | undefined>(DefaultQuery);
+
   const parsed = useParsedSQL(query);
 
   const onChangeResultType = useCallback((changeType: QueryViewType) => {
     setResultType(changeType);
     setResultTime(`${changeType}@${new Date().toISOString()}`);
   }, []);
+
+  const onClose = useCallback(() => setResultType("none"), []);
 
   return (
     <Splitter
@@ -43,9 +47,25 @@ export function QueryView() {
       bottom={
         {
           none: null,
-          inspect: <JsonInspect data={parsed} />,
-          run: <QueryRunner parsed={parsed} instanceKey={resultTime} />,
-          help: <QueryHelp />,
+          inspect: (
+            <div className="flex flex-grow flex-col">
+              <ResultTitle onClose={onClose}>Inspect Query</ResultTitle>
+              <JsonInspect data={parsed} />
+            </div>
+          ),
+          run: (
+            <QueryRunner
+              parsed={parsed}
+              instanceKey={resultTime}
+              onClose={onClose}
+            />
+          ),
+          help: (
+            <div className="flex flex-grow flex-col">
+              <ResultTitle onClose={onClose}>Query Help</ResultTitle>
+              <QueryHelp />
+            </div>
+          ),
         }[resultType]
       }
     />

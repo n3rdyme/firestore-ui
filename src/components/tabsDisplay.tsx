@@ -19,6 +19,8 @@ export interface TabConfig {
 export interface TabsDisplayProps {
   currentTab: number;
   tabs: TabConfig[];
+  beforeTabs?: React.ReactNode;
+  afterTabs?: React.ReactNode;
 }
 
 const tabStyle = [
@@ -35,9 +37,15 @@ const tabStyle = [
   "rounded-none",
 ].join(" ");
 
-export function TabsDisplay({ currentTab, tabs }: TabsDisplayProps) {
+export function TabsDisplay({
+  currentTab,
+  tabs,
+  beforeTabs,
+  afterTabs,
+}: TabsDisplayProps) {
   return (
-    <div className="border-b border-gray-200">
+    <div className="flex flex-row border-b border-gray-200">
+      {beforeTabs}
       <nav className="-mb-px flex space-x-4" aria-label="Tabs">
         {tabs.map((tab, index) => (
           <button
@@ -56,6 +64,7 @@ export function TabsDisplay({ currentTab, tabs }: TabsDisplayProps) {
           </button>
         ))}
       </nav>
+      {afterTabs}
     </div>
   );
 }

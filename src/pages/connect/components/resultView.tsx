@@ -7,13 +7,23 @@
  */
 
 import React, { useEffect, useMemo, useState } from "react";
-import { FaCheckCircle, FaStopCircle } from "react-icons/fa";
+import { FaCheckCircle, FaStopCircle, FaTimes } from "react-icons/fa";
 import { TabConfig, TabsDisplay } from "../../../components/tabsDisplay";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { properCase } from "../../../utils/properCase";
-import { ResultPanel } from "./resultPanel";
+import { ResultPanel, ResultPanelProps } from "./resultPanel";
 
-export function ResultView({ results }: { results: SqlStatementResult[] }) {
+export interface ResultViewProps
+  extends Pick<ResultPanelProps, "inProgress" | "error" | "onClose"> {
+  results: SqlStatementResult[];
+}
+
+export function ResultView({
+  inProgress,
+  error,
+  results,
+  onClose,
+}: ResultViewProps) {
   const resultsWithNames = React.useMemo(
     () =>
       results.map<SqlStatementResult & { name: string }>((result, index) => ({
@@ -53,13 +63,37 @@ export function ResultView({ results }: { results: SqlStatementResult[] }) {
 
   // Only one entry in results? don't show the tabs
   if (resultsWithNames.length <= 1) {
-    return <ResultPanel results={results[0]} />;
+    return (
+      <ResultPanel
+        inProgress={inProgress}
+        error={error}
+        results={results[0]}
+        onClose={onClose}
+      />
+    );
   }
 
   return (
     <div className="flex flex-grow flex-col">
       <h1 className="px-4 py-0 flex flex-col justify-center h-16">
-        <TabsDisplay tabs={resultTabs} currentTab={currentTab} />
+        <TabsDisplay
+          tabs={resultTabs}
+          currentTab={currentTab}
+          afterTabs={
+            <>
+              <div className="flex-grow" />
+              {!!onClose && (
+                <button
+                  type="button"
+                  className="bg-transparent text-dark py-1 px-2 h-8 w-8"
+                  onClick={onClose}
+                >
+                  <FaTimes />
+                </button>
+              )}
+            </>
+          }
+        />
       </h1>
       <ResultPanel results={results[currentTab]} />
     </div>

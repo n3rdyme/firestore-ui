@@ -7,23 +7,40 @@
  */
 
 import React from "react";
+import { ErrorMessage } from "../../../components/cardMessage";
 import { Spinner } from "../../../components/spinner";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { ResultViewType } from "./constants";
 import { JsonInspect } from "./jsonInspect";
 import { ResultDescription } from "./resultDescription";
 import { ResultTable } from "./resultTable";
-import { ResultToolbar } from "./resultToolbar";
+import { ResultToolbar, ResultToolbarProps } from "./resultToolbar";
 
-export function ResultPanel({ results }: { results?: SqlStatementResult }) {
+export interface ResultPanelProps extends Pick<ResultToolbarProps, "onClose"> {
+  inProgress?: boolean;
+  error?: Error | null;
+  results?: SqlStatementResult;
+}
+
+export function ResultPanel({
+  inProgress,
+  error,
+  results,
+  onClose,
+}: ResultPanelProps) {
   const [resultType, setResultType] = React.useState<ResultViewType>("table");
 
   return (
     <div className="flex flex-grow flex-col">
-      <ResultToolbar resultType={resultType} setResultType={setResultType} />
+      <ResultToolbar
+        resultType={resultType}
+        setResultType={setResultType}
+        onClose={onClose}
+      />
+      {!!error && <ErrorMessage message={error.message} />}
       {!results ? (
-        <div className="flex flex-grow flex-col relative">
-          <Spinner />
+        <div className="flex flex-grow flex-col items-center justify-center relative">
+          {inProgress ? <Spinner /> : "No Results"}
         </div>
       ) : (
         {

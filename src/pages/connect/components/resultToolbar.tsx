@@ -10,13 +10,15 @@ import React, { useCallback } from "react";
 import { BsZoomIn } from "react-icons/bs";
 import { FaCode, FaTable } from "react-icons/fa";
 import { ResultViewType } from "./constants";
+import { ResultTitle, ResultTitleProps } from "./resultTitle";
 
-export interface ResultToolbarProps {
+export interface ResultToolbarProps extends Omit<ResultTitleProps, "children"> {
   resultType: ResultViewType;
   setResultType: (type: ResultViewType) => void;
 }
 
 export function ResultToolbar({
+  onClose,
   resultType,
   setResultType,
 }: ResultToolbarProps) {
@@ -31,17 +33,18 @@ export function ResultToolbar({
   const onViewJson = useCallback(() => setResultType("json"), [setResultType]);
 
   return (
-    <div className="flex flex-row py-2 px-4 space-x-2 text-base text-dark bg-navy-300">
-      <button type="button" className="bg-light py-1" onClick={onViewTable}>
-        <FaTable className="mr-1" /> Data Table
-      </button>
-      <button type="button" className="bg-light py-1" onClick={onViewJson}>
-        <FaCode className="mr-1" /> JSON Data
-      </button>
-      <button type="button" className="bg-light py-1" onClick={onInspect}>
-        <BsZoomIn className="mr-1" /> Inspect
-      </button>
-      <div className="flex-grow" />
-    </div>
+    <ResultTitle onClose={onClose}>
+      <div className="flex flex-row flex-nowrap space-x-2 text-dark">
+        <button type="button" className="bg-light py-1" onClick={onViewTable}>
+          <FaTable className="mr-1" /> Data Table
+        </button>
+        <button type="button" className="bg-light py-1" onClick={onViewJson}>
+          <FaCode className="mr-1" /> JSON Data
+        </button>
+        <button type="button" className="bg-light py-1" onClick={onInspect}>
+          <BsZoomIn className="mr-1" /> Inspect
+        </button>
+      </div>
+    </ResultTitle>
   );
 }

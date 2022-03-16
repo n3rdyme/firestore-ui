@@ -13,15 +13,18 @@ import { promiseParallel } from "../../../utils/promiseParallel";
 import { useStatementExecutor } from "../../../hooks/useStatementExecutor";
 import { ErrorMessage } from "../../../components/cardMessage";
 import { ProgressModal } from "../../../components/progressModal";
-import { ResultView } from "./resultView";
+import { ResultView, ResultViewProps } from "./resultView";
+
+export interface QueryRunnerProps extends Pick<ResultViewProps, "onClose"> {
+  parsed: ParsedSQLResult;
+  instanceKey: string;
+}
 
 export function QueryRunner({
   parsed,
   instanceKey: inputKey,
-}: {
-  parsed: ParsedSQLResult;
-  instanceKey: string;
-}) {
+  onClose,
+}: QueryRunnerProps) {
   const sqlExec = useStatementExecutor();
   const [instanceKey, setInstanceKey] = useState(inputKey);
   const [error, setError] = React.useState<Error | null>(null);
@@ -39,7 +42,14 @@ export function QueryRunner({
 
   useEffect(() => {
     if (run !== instanceKey) {
-      setError(null);
+      const parseError = parsed.errors?.[0];
+      setError(
+        parseError
+          ? new Error(
+              `(${parseError.startLine}:${parseError.startCol}) ${parseError.message}`
+            )
+          : null
+      );
       setResults([]);
       cancelRequest.current.cancel = false;
       setProgress({ count: 0, total: parsed.statements.length });
@@ -72,8 +82,12 @@ export function QueryRunner({
           progress?.total === 1 ? "query" : `${progress?.total} queries`
         }...`}
       />
-      {!!error && <ErrorMessage message={error.message} />}
-      <ResultView results={results} />
+      <ResultView
+        inProgress={!!progress}
+        error={error}
+        results={results}
+        onClose={onClose}
+      />
     </div>
   );
 }
