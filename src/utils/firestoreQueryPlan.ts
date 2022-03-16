@@ -32,6 +32,13 @@ import {
 } from "../services/sqlStatement";
 import { promiseParallel } from "./promiseParallel";
 
+// Just used to ensure that this class doesn't care about the type of the
+// statement, or if the statement has columns or not.
+type SqlStatementQuery = Pick<
+  SqlStatement,
+  "table" | "query" | "orderBy" | "offset" | "limit"
+>;
+
 export class FirestoreQueryPlan {
   private collection: CollectionReference<DocumentData>;
 
@@ -45,7 +52,7 @@ export class FirestoreQueryPlan {
     return this.totalRecords;
   }
 
-  public async execute(statement: SqlStatement) {
+  public async execute(statement: SqlStatementQuery) {
     const found = await this.getDocuments(statement);
 
     // At this point, firestore has done what very little it can for us, now the rest is up to us ;)
@@ -65,7 +72,7 @@ export class FirestoreQueryPlan {
   }
 
   filterResults(
-    statement: SqlStatement,
+    statement: SqlStatementQuery,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
     const { query: criteria } = statement;
@@ -104,7 +111,7 @@ export class FirestoreQueryPlan {
   }
 
   orderedResults(
-    statement: SqlStatement,
+    statement: SqlStatementQuery,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
     const { orderBy: orderByFields } = statement;
@@ -136,7 +143,7 @@ export class FirestoreQueryPlan {
   }
 
   async getDocuments(
-    statement: SqlStatement
+    statement: SqlStatementQuery
   ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
     // It's usually more efficient to use multiple queries if there are multiple equality conditions,
     // i.e. WHERE ( id = 1 or id = 2 )
@@ -178,8 +185,8 @@ export class FirestoreQueryPlan {
   }
 
   private planMultipleQueries(
-    statement: SqlStatement
-  ): SqlStatement[] | undefined {
+    statement: SqlStatementQuery
+  ): SqlStatementQuery[] | undefined {
     const { query: criteria } = statement;
 
     if (!criteria || criteria.or.length === 0) {
@@ -199,7 +206,7 @@ export class FirestoreQueryPlan {
       return undefined;
     }
 
-    const plans: SqlStatement[] = criteria.or.map((c) => {
+    const plans: SqlStatementQuery[] = criteria.or.map((c) => {
       return {
         ...statement,
         query: {
@@ -215,7 +222,7 @@ export class FirestoreQueryPlan {
     return plans;
   }
 
-  private getQuery(statement: SqlStatement): QueryConstraint[] {
+  private getQuery(statement: SqlStatementQuery): QueryConstraint[] {
     const { query: criteria } = statement;
 
     // console.info(
@@ -267,7 +274,7 @@ export class FirestoreQueryPlan {
     return [];
   }
 
-  private getLimits(statement: SqlStatement): QueryConstraint[] {
+  private getLimits(statement: SqlStatementQuery): QueryConstraint[] {
     if (!statement.limit) {
       return [];
     }

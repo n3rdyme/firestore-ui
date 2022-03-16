@@ -10,10 +10,12 @@ import { useCallback } from "react";
 import { SqlStatement, SqlStatementResult } from "../services/sqlStatement";
 import { useSqlInsertExecutor } from "./useSqlInsertExecutor";
 import { useSqlSelectExecutor } from "./useSqSelectExecutor";
+import { useSqUpdateExecutor } from "./useSqUpdateExecutor";
 
 export function useStatementExecutor() {
   const execInsert = useSqlInsertExecutor();
   const execSelect = useSqlSelectExecutor();
+  const execUpdate = useSqUpdateExecutor();
 
   return useCallback(
     async (statement: SqlStatement): Promise<SqlStatementResult> => {
@@ -24,6 +26,8 @@ export function useStatementExecutor() {
         result = await execInsert(statement);
       } else if (statement.type === "select") {
         result = await execSelect(statement);
+      } else if (statement.type === "update") {
+        result = await execUpdate(statement);
       } else {
         throw new Error(`Unsupported statement type: ${statement.type}`);
       }
@@ -31,6 +35,6 @@ export function useStatementExecutor() {
       result.timeTaken = Date.now() - startedAt;
       return result;
     },
-    [execInsert, execSelect]
+    [execInsert, execSelect, execUpdate]
   );
 }

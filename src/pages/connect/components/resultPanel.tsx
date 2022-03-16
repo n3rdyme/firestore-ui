@@ -8,6 +8,7 @@
 
 import numeral from "numeral";
 import React, { useMemo } from "react";
+import { Spinner } from "../../../components/spinner";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { ResultViewType } from "./constants";
 import { JsonInspect } from "./jsonInspect";
@@ -43,13 +44,18 @@ export function ResultPanel({ results }: { results?: SqlStatementResult }) {
   return (
     <div className="flex flex-grow flex-col">
       <ResultToolbar resultType={resultType} setResultType={setResultType} />
-      {
+      {!results ? (
+        <div className="flex-grow relative">
+          <Spinner />
+        </div>
+      ) : (
         {
-          table: !results ? null : <ResultTable results={results} />,
-          json: !results ? null : <JsonInspect data={results.rows} />,
-          inspect: !results ? null : <JsonInspect data={results} />,
+          table: <ResultTable results={results} />,
+          json: <JsonInspect data={results.rows} />,
+          inspect: <JsonInspect data={results} />,
         }[resultType]
-      }
+      )}
+
       <div className="bg-gray-400 border-t border-navy-300 py-1 px-4 text-xs">
         {description}
       </div>

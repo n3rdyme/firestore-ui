@@ -12,7 +12,7 @@
 
 export function promiseParallel<TArray, TResult>(
   input: TArray[],
-  mapper: (item: TArray) => Promise<TResult>,
+  mapper: (item: TArray, index: number) => Promise<TResult>,
   concurrency = 1,
   progress: (progress: number, total: number) => void = () => {
     /* noop */
@@ -32,7 +32,7 @@ export function promiseParallel<TArray, TResult>(
       ? Promise.resolve()
       : Promise.resolve(offset++)
           .then((ix) => {
-            return mapper(input[ix]).then((result) => {
+            return mapper(input[ix], ix).then((result) => {
               results[ix] = result;
             });
           })

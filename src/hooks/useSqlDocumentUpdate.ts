@@ -15,6 +15,6 @@ export function useSqlDocumentUpdate() {
   // like author and date at some point, so I'm going to make it a hook now.
 
   return useCallback((doc: any, col: SqlColumn, value: SqlValue) => {
-    new SqlFieldValue(col).setValue(doc, value);
+    new SqlFieldValue(col).setValueFrom(doc, value);
   }, []);
 }

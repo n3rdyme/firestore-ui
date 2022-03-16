@@ -57,6 +57,7 @@ export class SqlFieldValue {
       return undefined;
     }
 
+    console.error(`Unknown type: ${this.data.type}`, this.data);
     throw new Error(`Unknown value type: ${this.data.type}`);
   }
 
@@ -92,7 +93,11 @@ export class SqlFieldValue {
     return undefined;
   }
 
-  public setValue(doc: any, newValue: SqlValue): any {
+  public setValueFrom(doc: any, newValue: SqlValue): any {
+    this.setValue(doc, new SqlFieldValue(newValue).getValue(doc));
+  }
+
+  public setValue(doc: any, newValue: any): any {
     if (!this.isField) {
       throw new Error("The field references a value, not a column.");
     }
@@ -111,7 +116,7 @@ export class SqlFieldValue {
       }
 
       if (ix === parts.length - 1) {
-        data[key] = new SqlFieldValue(newValue).getValue(doc);
+        data[key] = newValue;
         return;
       }
 
