@@ -48,6 +48,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "postinstall": "node antlr/post-install-fix.js",
     "css": "./node_modules/.bin/tailwindcss -i ./src/styles/index.css -o ./src/styles/output.css",
     "css:watch": "npm run css -- --watch",
     "antlr4": "node ./antlr/antlr4.js",
