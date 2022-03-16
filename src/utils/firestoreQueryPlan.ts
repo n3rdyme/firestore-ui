@@ -150,7 +150,7 @@ export class FirestoreQueryPlan {
     const plans = this.planMultipleQueries(statement);
     if (plans) {
       const allResults = await promiseParallel(plans, (p) =>
-        this.getDocuments(p)
+        this.getDocumentsFromQuery(p)
       );
 
       const combinedResult = allResults.reduce(
@@ -170,6 +170,13 @@ export class FirestoreQueryPlan {
     }
 
     // Otherwise, we can use a single query
+    return this.getDocumentsFromQuery(statement);
+  }
+
+  async getDocumentsFromQuery(
+    statement: SqlStatementQuery
+  ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
+    // single query execution
     const constraints = [
       ...this.getQuery(statement),
       ...this.getOrderBy(statement.query, statement.orderBy),
@@ -189,7 +196,7 @@ export class FirestoreQueryPlan {
   ): SqlStatementQuery[] | undefined {
     const { query: criteria } = statement;
 
-    if (!criteria || criteria.or.length === 0) {
+    if (!criteria || criteria.or.length <= 1) {
       return undefined;
     }
 
@@ -197,10 +204,10 @@ export class FirestoreQueryPlan {
       (or) => or.and.filter((c) => c.op === "=").length
     );
 
+    const common = this.commonCriteria(criteria);
+
     // Use multiple queries if any or condition has more than one equality in addition to those in common
-    const useMultipleQueries = equalCounters.some(
-      (c) => c !== criteria.common?.length
-    );
+    const useMultipleQueries = equalCounters.some((c) => c !== common?.length);
 
     if (!useMultipleQueries) {
       return undefined;
@@ -237,21 +244,15 @@ export class FirestoreQueryPlan {
       return [];
     }
 
-    if (criteria.common?.length) {
-      return criteria.common
-        .filter(
-          (c) =>
-            c.left &&
-            c.right &&
-            c.left.type === "column" &&
-            c.right?.type !== "column"
-        )
-        .map((c) => {
-          const lhs = new SqlFieldValue(c.left!);
-          const rhs = new SqlFieldValue(c.right!);
-          // console.debug("where", [lhs.fqFieldName, "==", rhs.value]);
-          return where(lhs.fqFieldName, "==", rhs.value);
-        });
+    const common = this.commonCriteria(criteria);
+
+    if (common?.length) {
+      return common.map((c) => {
+        const lhs = new SqlFieldValue(c.left!);
+        const rhs = new SqlFieldValue(c.right!);
+        // console.debug("where", [lhs.fqFieldName, "==", rhs.value]);
+        return where(lhs.fqFieldName, "==", rhs.value);
+      });
     }
 
     if (criteria.or[0].and.length === 1) {
@@ -279,15 +280,16 @@ export class FirestoreQueryPlan {
       return [];
     }
 
+    const common = this.commonCriteria(statement.query);
+
     let limitSafe = false;
     if (!statement.query?.or.length) {
       limitSafe = (statement?.orderBy?.length ?? 0) <= 1;
     } else {
       const isSimpleCriteria =
         (statement.query?.or.length ?? 0) <= 1 &&
-        statement.query?.or[0].and.length ===
-          (statement.query?.common?.length ?? -1) &&
-        !statement.query?.common?.find(
+        statement.query?.or[0].and.length === (common?.length ?? -1) &&
+        !common?.find(
           (c) =>
             (c.left?.type === "column" && c.right?.type !== "column") ||
             (c.left?.type !== "column" && c.right?.type === "column")
@@ -314,6 +316,20 @@ export class FirestoreQueryPlan {
       ];
     }
 
+    return [];
+  }
+
+  private commonCriteria(criteria: SqlStatement["query"]) {
+    if (criteria?.common?.length) {
+      const result = criteria.common.filter(
+        (c) =>
+          c.left?.type === "column" &&
+          c.right?.type !== "default" &&
+          c.right?.type !== "null" &&
+          c.right?.type !== "column"
+      );
+      return result;
+    }
     return [];
   }
 }
