@@ -330,6 +330,12 @@ SqlParserVisitor.prototype.visitConstantAtoms = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#predicateOperand.
+SqlParserVisitor.prototype.visitPredicateOperand = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by SqlParser#constantValueAtom.
 SqlParserVisitor.prototype.visitConstantValueAtom = function(ctx) {
   return this.visitChildren(ctx);
