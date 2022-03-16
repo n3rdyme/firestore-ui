@@ -71,7 +71,7 @@ export class FirestoreQueryPlan {
     return results;
   }
 
-  filterResults(
+  private filterResults(
     statement: SqlStatementQuery,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
@@ -95,7 +95,7 @@ export class FirestoreQueryPlan {
         ? undefined
         : new SqlFieldValue(exp.left).getValue(data);
 
-      // console.debug(`${lhs} ${exp.op} ${rhs} = ${op.compare(lhs, rhs)}`);
+      console.debug(`${lhs} ${exp.op} ${rhs} = ${op.compare(lhs, rhs)}`);
       return op.compare(lhs, rhs) === true;
     };
 
@@ -110,7 +110,7 @@ export class FirestoreQueryPlan {
     return dataset.filter((doc: any) => testOr(criteria.or, doc));
   }
 
-  orderedResults(
+  private orderedResults(
     statement: SqlStatementQuery,
     dataset: QueryDocumentSnapshot<DocumentData>[]
   ): QueryDocumentSnapshot<DocumentData>[] {
@@ -142,7 +142,7 @@ export class FirestoreQueryPlan {
     });
   }
 
-  async getDocuments(
+  private async getDocuments(
     statement: SqlStatementQuery
   ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
     // It's usually more efficient to use multiple queries if there are multiple equality conditions,
@@ -173,7 +173,7 @@ export class FirestoreQueryPlan {
     return this.getDocumentsFromQuery(statement);
   }
 
-  async getDocumentsFromQuery(
+  private async getDocumentsFromQuery(
     statement: SqlStatementQuery
   ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
     // single query execution
