@@ -646,7 +646,16 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#isNullPredicate.
   override visitIsNullPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const left = this.visitPredicateOperand(ctx.left);
+    const exp: SqlPredicate = {
+      left,
+      op: "=",
+      right: { type: "null", value: ctx.nil?.getText() ?? "NULL" },
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#binaryComparisonPredicate.

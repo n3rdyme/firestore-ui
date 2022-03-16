@@ -9,6 +9,7 @@
 import React, { useCallback } from "react";
 import { Splitter } from "../../../components/splitter";
 import { useParsedSQL } from "../../../hooks/useParsedSQL";
+import { useDebouncedStateStorage } from "../../../hooks/useStateStorage";
 import { DefaultQuery, QueryViewType } from "./constants";
 import { QueryEdit } from "./queryEdit";
 import { QueryHelp } from "./queryHelp";
@@ -20,9 +21,12 @@ import { ResultTitle } from "./resultTitle";
 export function QueryView() {
   const [resultType, setResultType] = React.useState<QueryViewType>("none");
   const [resultTime, setResultTime] = React.useState("");
-  const [query, setQuery] = React.useState<string | undefined>(DefaultQuery);
+  const [query, debouncedQuery, setQuery] = useDebouncedStateStorage<
+    string | undefined
+  >("last-query", DefaultQuery, 400);
 
-  const parsed = useParsedSQL(query);
+  console.log(debouncedQuery);
+  const parsed = useParsedSQL(debouncedQuery);
 
   const onChangeResultType = useCallback((changeType: QueryViewType) => {
     setResultType(changeType);
@@ -38,6 +42,7 @@ export function QueryView() {
       top={
         <>
           <QueryToolbar
+            isValid={!parsed.errors?.length}
             resultType={resultType}
             setResultType={onChangeResultType}
           />
