@@ -95,7 +95,7 @@ export class FirestoreQueryPlan {
         ? undefined
         : new SqlFieldValue(exp.left).getValue(data);
 
-      console.debug(`${lhs} ${exp.op} ${rhs} = ${op.compare(lhs, rhs)}`);
+      // console.debug(`${lhs} ${exp.op} ${rhs} = ${op.compare(lhs, rhs)}`);
       return op.compare(lhs, rhs) === true;
     };
 
