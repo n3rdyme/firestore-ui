@@ -11,7 +11,6 @@ import { ParsedSQLResult } from "../../../hooks/useParsedSQL";
 import { SqlStatementResult } from "../../../services/sqlStatement";
 import { promiseParallel } from "../../../utils/promiseParallel";
 import { useStatementExecutor } from "../../../hooks/useStatementExecutor";
-import { ErrorMessage } from "../../../components/cardMessage";
 import { ProgressModal } from "../../../components/progressModal";
 import { ResultView, ResultViewProps } from "./resultView";
 
