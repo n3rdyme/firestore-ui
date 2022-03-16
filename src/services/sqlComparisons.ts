@@ -48,12 +48,16 @@ export const sqlComparisonTable: ComparisonTable = {
   "=": {
     invert: "!=",
     reorder: "=",
-    compare: coerceTypeCompare((a: any, b: any) => a === b),
+    compare: coerceTypeCompare(
+      (a: any, b: any) => (a == null && b == null) || a === b
+    ),
   },
   "!=": {
     invert: "=",
     reorder: "!=",
-    compare: coerceTypeCompare((a: any, b: any) => a !== b),
+    compare: coerceTypeCompare(
+      (a: any, b: any) => !((a == null && b == null) || a === b)
+    ),
   },
   ">": {
     invert: "<=",

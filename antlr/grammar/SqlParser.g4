@@ -250,17 +250,21 @@ expression
     ;
 
 predicate
-    : left=constOrColumnAtom not=NOT? IN '(' (values=constantAtoms) ')'           #inPredicate
-    | left=constOrColumnAtom IS not=NOT? nil=nullLiteral                          #isNullPredicate
-    | left=constOrColumnAtom op=comparisonOperator right=constOrColumnAtom        #binaryComparisonPredicate
-    | left=constOrColumnAtom not=NOT? BETWEEN min=constant AND max=constant       #betweenPredicate
-    | left=constOrColumnAtom not=NOT? LIKE like=STRING_LITERAL                    #likePredicate
-    | left=constOrColumnAtom not=NOT? (REGEXP | RLIKE) regex=STRING_LITERAL       #regexpPredicate
-    | expressionAtom                                                              #expressionAtomPredicate
+    : left=predicateOperand not=NOT? IN '(' (values=constantAtoms) ')'           #inPredicate
+    | left=predicateOperand IS not=NOT? nil=nullLiteral                          #isNullPredicate
+    | left=predicateOperand op=comparisonOperator right=predicateOperand         #binaryComparisonPredicate
+    | left=predicateOperand not=NOT? BETWEEN min=constant AND max=constant       #betweenPredicate
+    | left=predicateOperand not=NOT? LIKE like=STRING_LITERAL                    #likePredicate
+    | left=predicateOperand not=NOT? (REGEXP | RLIKE) regex=STRING_LITERAL       #regexpPredicate
+    | expressionAtom                                                             #expressionAtomPredicate
     ;
 
 constantAtoms
     : constant (',' constant)*
+    ;
+
+predicateOperand
+    : constOrColumnAtom
     ;
 
 constOrColumnAtom

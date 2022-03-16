@@ -25,6 +25,9 @@ import { mapSynonymOperations } from "./sqlComparisons";
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
+const hasType = (obj: any) => !!obj?.type;
+const isDefined = (obj: any) => !!obj;
+
 export class SqlStatementVisitor extends SqlParserVisitor {
   private readonly output: SqlStatement[];
 
@@ -250,7 +253,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     }
     if (ctx.values) {
       statement.values = this.visitInsertStatementValue(ctx.values).filter(
-        (o: any) => !!o
+        hasType
       );
     }
 
@@ -275,7 +278,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#orderByClause.
   override visitOrderByClause(ctx: ParserRuleContext) {
     return {
-      orderBy: this.visitChildren(ctx).filter((o: any) => !!o),
+      orderBy: this.visitChildren(ctx).filter(isDefined),
     };
   }
 
@@ -290,9 +293,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#selectElements.
   override visitSelectElements(ctx: ParserRuleContext) {
-    const columns: SqlColumn[] = this.visitChildren(ctx).filter(
-      (o: any) => !!o
-    );
+    const columns: SqlColumn[] = this.visitChildren(ctx).filter(hasType);
     if (ctx.star && !columns.find((c) => c.value === "*")) {
       columns.push({ type: "column", value: "*", star: true });
     }
@@ -363,7 +364,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#fullId.
   override visitFullId(ctx: ParserRuleContext) {
-    const values = this.visitChildren(ctx).filter((o: any) => !!o);
+    const values = this.visitChildren(ctx).filter(isDefined);
     if (values.length === 1) {
       return values[0];
     }
@@ -386,7 +387,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#fullColumnName.
   override visitFullColumnName(ctx: ParserRuleContext) {
-    const values = this.visitChildren(ctx).filter((o: any) => !!o);
+    const values = this.visitChildren(ctx).filter(isDefined);
     if (values.length === 1) {
       return values[0];
     }
@@ -461,7 +462,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#dottedId.
   override visitDottedId(ctx: ParserRuleContext) {
-    const [idOrToken, id2] = this.visitChildren(ctx).filter((o: any) => !!o);
+    const [idOrToken, id2] = this.visitChildren(ctx).filter(isDefined);
     // Token '.' would be undefined, so use the second argument
     return idOrToken ?? id2;
   }
@@ -555,7 +556,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   }
 
   override visitConstantsOrDefaults(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx).filter((o: any) => !!o?.type);
+    return this.visitChildren(ctx).filter(hasType);
   }
 
   override visitConstantOrDefault(ctx: ParserRuleContext) {
@@ -576,7 +577,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
   // Visit a parse tree produced by SqlParser#fullColumnNameList.
   override visitFullColumnNameList(ctx: ParserRuleContext) {
     const columnNames: string[] = this.visitChildren(ctx).filter(
-      (o: any) => !!o
+      isDefined
     ) as any;
     return columnNames.map<SqlColumn>((name) => ({
       type: "column",
@@ -622,12 +623,39 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#inPredicate.
   override visitInPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const left = this.visitPredicateOperand(ctx.left);
+    const args = this.visitConstantAtoms(ctx.values).filter(hasType);
+    const exp: SqlExpression = {
+      or: args.map((right: any) => ({
+        left,
+        op: "=",
+        right,
+      })),
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
+    return exp;
+  }
+
+  // Visit a parse tree produced by SqlParser#predicateOperand.
+  override visitPredicateOperand(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    return value;
   }
 
   // Visit a parse tree produced by SqlParser#isNullPredicate.
   override visitIsNullPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    const left = this.visitPredicateOperand(ctx.left);
+    const exp: SqlPredicate = {
+      left,
+      op: "=",
+      right: { type: "null", value: ctx.nil?.getText() ?? "NULL" },
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#binaryComparisonPredicate.

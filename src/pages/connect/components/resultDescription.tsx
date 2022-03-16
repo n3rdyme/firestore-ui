@@ -22,7 +22,7 @@ export function ResultDescription({
     let text = `${numeral(results.recordsAffected).format("0,0")} record${
       results.recordsAffected > 1 ? "s" : ""
     } affected`;
-    if (results.recordsFetched) {
+    if (results.recordsFetched != null) {
       text += `, ${numeral(results.recordsFetched).format("0,0")} record${
         results.recordsFetched > 1 ? "s" : ""
       } fetched`;

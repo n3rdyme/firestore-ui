@@ -6,17 +6,18 @@
  * ****************************************************************************
  */
 
-import { useEffect } from "react";
-import useDebouncedState from "./useDebouncedState";
+import { useState, useEffect } from "react";
+import { useDebouncedValue } from "./useDebouncedValue";
 
 export const useWindowWidth = () => {
-  const [value, , setValue] = useDebouncedState(window.innerWidth, 500);
+  const [width, setWidth] = useState(window.innerWidth);
+  const debouncedWidth = useDebouncedValue(width, 500);
 
   useEffect(() => {
-    const handleResize = () => setValue(window.innerWidth);
+    const handleResize = () => setWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [setValue]);
+  }, []);
 
-  return value;
+  return debouncedWidth;
 };
