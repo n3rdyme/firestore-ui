@@ -25,7 +25,6 @@ export function QueryView() {
     string | undefined
   >("last-query", DefaultQuery, 400);
 
-  console.log(debouncedQuery);
   const parsed = useParsedSQL(debouncedQuery);
 
   const onChangeResultType = useCallback((changeType: QueryViewType) => {
