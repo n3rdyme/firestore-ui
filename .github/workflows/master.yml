@@ -2,10 +2,9 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy Hosting @master
-"on":
+on:
   push:
-    branches:
-      - master
+    branches: [master]
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
