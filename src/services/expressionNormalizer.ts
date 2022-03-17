@@ -80,12 +80,6 @@ export class ExpressionNormalizer {
       const json = JSON.stringify(current);
       const copy = JSON.parse(json);
       const found = this.findNode(copy, (c) => c.or != null);
-      // eslint-disable-next-line quotes
-      if (json.includes('"or"') && !found) {
-        console.warn("Unable to normalize expression tree.", { found, copy });
-      } else {
-        console.warn("Found or expression in tree.", { found, copy });
-      }
       if (!found?.or) {
         result.push(current);
       } else if (found.or.length === 1) {
