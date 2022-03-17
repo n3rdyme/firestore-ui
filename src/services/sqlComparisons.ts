@@ -59,9 +59,47 @@ export function mapSynonymOperations(op: string): SqlComparisonType {
   }
 }
 
+function invert(b: boolean | undefined) {
+  return b === undefined ? undefined : !b;
+}
+
+function equals(a: any, b: any) {
+  if (a == null && b == null) return true;
+  if (a == null || b == null) return false;
+
+  if (typeof a === "object" && typeof b === "object") {
+    return _.isEqual(a, b);
+  }
+
+  return a === b;
+}
+
 // TODO: add support for appropriate type coercion.
-function coerceTypeCompare(cmp: (a: any, b: any) => boolean) {
-  return (a: any, b: any): boolean | undefined => {
+function coerceTypeCompare(cmp: (a: any, b: any) => boolean | undefined) {
+  return (inA: any, inB: any): boolean | undefined => {
+    let a = inA;
+    let b = inB;
+    if (a != null && typeof a === "object") {
+      if (a.toDate) a = a.toDate();
+      if (a instanceof Date) a = a.toISOString();
+    }
+    if (b != null && typeof b === "object") {
+      if (b.toDate) b = b.toDate();
+      if (b instanceof Date) b = b.toISOString();
+    }
+    if (typeof a === "number" && typeof b === "string") {
+      a = a.toString();
+    }
+    if (typeof b === "number" && typeof a === "string") {
+      b = b.toString();
+    }
+    if (typeof a === "boolean" && typeof b === "string") {
+      a = a.toString();
+    }
+    if (typeof b === "boolean" && typeof a === "string") {
+      b = b.toString();
+    }
+
     return cmp(a, b);
   };
 }
@@ -78,16 +116,12 @@ export const sqlComparisonTable: ComparisonTable = {
   "=": {
     invert: "!=",
     reorder: "=",
-    compare: coerceTypeCompare(
-      (a: any, b: any) => (a == null && b == null) || a === b
-    ),
+    compare: coerceTypeCompare(equals),
   },
   "!=": {
     invert: "=",
     reorder: "!=",
-    compare: coerceTypeCompare(
-      (a: any, b: any) => !((a == null && b == null) || a === b)
-    ),
+    compare: coerceTypeCompare((a: any, b: any) => invert(equals(a, b))),
   },
   ">": {
     invert: "<=",
@@ -121,12 +155,12 @@ export const sqlComparisonTable: ComparisonTable = {
           console.error(`Invalid regex: ${JSON.stringify(b)}`, ex);
         }
       }
-      return false;
+      return undefined;
     }),
   },
   "!like": {
     invert: "like",
-    compare: (a: any, b: any) => !sqlComparisonTable.like.compare(a, b),
+    compare: (a: any, b: any) => invert(sqlComparisonTable.like.compare(a, b)),
   },
   regex: {
     invert: "!regex",
@@ -140,11 +174,11 @@ export const sqlComparisonTable: ComparisonTable = {
           console.error(`Invalid regex: ${JSON.stringify(b)}`, ex);
         }
       }
-      return false;
+      return undefined;
     }),
   },
   "!regex": {
     invert: "regex",
-    compare: (a: any, b: any) => !sqlComparisonTable.regex.compare(a, b),
+    compare: (a: any, b: any) => invert(sqlComparisonTable.regex.compare(a, b)),
   },
 };
