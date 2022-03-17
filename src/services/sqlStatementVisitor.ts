@@ -686,11 +686,33 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#likePredicate.
   override visitLikePredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    // left=predicateOperand not=NOT? LIKE like=STRING_LITERAL
+    const left = this.visitPredicateOperand(ctx.left);
+    const like = this.visitStringLiteral(ctx.like);
+    const exp: SqlPredicate = {
+      left,
+      op: "like",
+      right: like,
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#regexpPredicate.
   override visitRegexpPredicate(ctx: ParserRuleContext) {
+    // left=predicateOperand not=NOT? (REGEXP | RLIKE) regex=stringLiteral
+    const left = this.visitPredicateOperand(ctx.left);
+    const regex = this.visitStringLiteral(ctx.regex);
+    const exp: SqlPredicate = {
+      left,
+      op: "regex",
+      right: regex,
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
     return this.visitChildren(ctx);
   }
 

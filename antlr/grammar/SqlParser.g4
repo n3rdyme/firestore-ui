@@ -254,8 +254,8 @@ predicate
     | left=predicateOperand IS not=NOT? nil=nullLiteral                          #isNullPredicate
     | left=predicateOperand op=comparisonOperator right=predicateOperand         #binaryComparisonPredicate
     | left=predicateOperand not=NOT? BETWEEN min=constant AND max=constant       #betweenPredicate
-    | left=predicateOperand not=NOT? LIKE like=STRING_LITERAL                    #likePredicate
-    | left=predicateOperand not=NOT? (REGEXP | RLIKE) regex=STRING_LITERAL       #regexpPredicate
+    | left=predicateOperand not=NOT? LIKE like=stringLiteral                     #likePredicate
+    | left=predicateOperand not=NOT? (REGEXP | RLIKE) regex=stringLiteral        #regexpPredicate
     | expressionAtom                                                             #expressionAtomPredicate
     ;
 
