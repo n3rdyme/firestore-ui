@@ -19,6 +19,7 @@ export interface IHaveName {
 export interface SqlTable extends IHaveName {
   name: string;
   alias?: string;
+  identifier?: string;
 }
 
 export interface SqlColumn extends SqlValue {
@@ -71,7 +72,6 @@ export interface SqlStatement {
   type?: "select" | "insert" | "update" | "delete";
   table?: SqlTable[];
   columns?: SqlColumn[];
-  identifier?: string;
   values?: SqlValue[][];
   orderBy?: SqlOrder[];
   where?: string;

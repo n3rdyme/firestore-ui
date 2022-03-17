@@ -188,12 +188,14 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     };
     if (ctx.table) {
       statement.table = [{ name: this.visitTableName(ctx.table) }];
+      if (ctx.identifier) {
+        statement.table[0].identifier = this.visitFullColumnName(
+          ctx.identifier
+        );
+      }
     }
     if (ctx.columns) {
       statement.columns = this.visitFullColumnNameList(ctx.columns);
-    }
-    if (ctx.identifier) {
-      statement.identifier = this.visitFullColumnName(ctx.identifier);
     }
 
     // Object.assign(statement, ...this.visitChildren(ctx));

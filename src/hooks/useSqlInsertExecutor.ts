@@ -23,7 +23,7 @@ export function useSqlInsertExecutor() {
         throw new Error("Expected insert statement");
       }
 
-      const { table, identifier, columns, values: rows } = statement;
+      const { table, columns, values: rows } = statement;
       if (!table?.[0].name || !columns || !rows) {
         throw new Error("Expected insert with table, columns, and values");
       }
@@ -40,7 +40,7 @@ export function useSqlInsertExecutor() {
         const doc = {};
         columns.forEach((col, ix) => modify(doc, col, values[ix]));
         result.rows.push(doc);
-        await insert(table[0].name, identifier, doc)
+        await insert(table[0].name, table[0].identifier, doc)
           .then(() => {
             result.recordsAffected += 1;
           })

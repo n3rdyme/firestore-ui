@@ -47,7 +47,7 @@ sqlStatement
 
 insertStatement
     : INSERT
-      INTO? table=tableName (WITH KEY '=' identifier=fullColumnName)?
+      INTO? table=tableName (WITH KEY identifier=fullColumnName)?
       (valueSet=insertStatementSetValues | values=insertStatementValues)
     ;
     
@@ -117,7 +117,7 @@ orderByExpression
     ;
 
 tableSource
-    : tableName (AS? alias=uid)?
+    : tableName (AS? alias=uid)? (WITH KEY identifier=fullColumnName)?
     ;
 
 limitClause
