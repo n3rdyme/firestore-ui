@@ -6,7 +6,7 @@
  * ****************************************************************************
  */
 
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import stringify from "json-stringify-pretty-compact";
 import Editor from "@monaco-editor/react";
 import { useWindowWidth } from "../../../hooks/useWindowWidth";

@@ -6,7 +6,7 @@
  * ****************************************************************************
  */
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { SqlColumn } from "../../../services/sqlStatement";
 import { classNames } from "../../../utils/classNames";

@@ -7,7 +7,6 @@
  */
 
 import React, { useCallback } from "react";
-import { FaTimes } from "react-icons/fa";
 import { Modal } from "../../../components/modal";
 import { JsonInspect } from "./jsonInspect";
 
