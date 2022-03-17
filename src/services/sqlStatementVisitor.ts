@@ -497,9 +497,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     const text = ctx.getText();
     const stringValue = text
       .substring(1, text.length - 1)
-      .replace(/(""|\\.)/g, (txt) => {
-        if (txt === '""') {
-          return '"';
+      .replace(/(''|\\.)/g, (txt) => {
+        if (txt === "''") {
+          return "'";
         }
         return this.unescapeChar(txt[1]);
       });
