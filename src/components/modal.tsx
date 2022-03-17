@@ -7,13 +7,16 @@
  */
 
 import React from "react";
+import { FaTimes } from "react-icons/fa";
+import { classNames } from "../utils/classNames";
 
-export type ModalProps = { shown: boolean; onOverlayClick?: () => void } & Pick<
-  React.HTMLProps<HTMLDivElement>,
-  "children"
->;
+export type ModalProps = {
+  shown: boolean;
+  maxWidth?: string;
+  onClose?: () => void;
+} & Pick<React.HTMLProps<HTMLDivElement>, "children">;
 
-export function Modal({ shown, onOverlayClick, children }: ModalProps) {
+export function Modal({ shown, onClose, maxWidth, children }: ModalProps) {
   if (!shown) {
     return null;
   }
@@ -29,7 +32,7 @@ export function Modal({ shown, onOverlayClick, children }: ModalProps) {
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           aria-hidden="true"
-          onClick={onOverlayClick}
+          onClick={onClose}
         />
 
         <span
@@ -38,7 +41,24 @@ export function Modal({ shown, onOverlayClick, children }: ModalProps) {
         >
           &#8203;
         </span>
-        <div className="relative inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6">
+        <div
+          className={classNames(
+            "relative inline-block align-bottom",
+            "bg-white rounded-lg px-4 pt-5 pb-4",
+            "text-left overflow-hidden shadow-xl",
+            "transform transition-all",
+            "w-full sm:w-auto",
+            "sm:my-8 sm:align-middle sm:w-full sm:p-6",
+            maxWidth ?? "sm:max-w-md"
+          )}
+        >
+          <button
+            type="button"
+            className="absolute top-3 right-3 ml-auto text-gray-500"
+            onClick={onClose}
+          >
+            <FaTimes />
+          </button>
           <div className="flex flex-col w-full">{children}</div>
         </div>
       </div>

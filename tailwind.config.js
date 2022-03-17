@@ -47,7 +47,9 @@ module.exports = {
       },
       maxWidth: {
         "16": "4rem",
-        "64": "16rem"
+        "64": "16rem",
+        "screen-60": "60vw",
+        "screen-80": "80vw",
       }
     },
   },

@@ -127,10 +127,7 @@ export function UpsertView() {
           cancelRequest.current.cancel = true;
         }}
       />
-      <Modal
-        shown={!!uploadError}
-        onOverlayClick={() => setUploadError(undefined)}
-      >
+      <Modal shown={!!uploadError} onClose={() => setUploadError(undefined)}>
         <div>{uploadError?.message}</div>
       </Modal>
     </div>
