@@ -80,6 +80,12 @@ export class ExpressionNormalizer {
       const json = JSON.stringify(current);
       const copy = JSON.parse(json);
       const found = this.findNode(copy, (c) => c.or != null);
+      // eslint-disable-next-line quotes
+      if (json.includes('"or"') && !found) {
+        console.warn("Unable to normalize expression tree.", { found, copy });
+      } else {
+        console.warn("Found or expression in tree.", { found, copy });
+      }
       if (!found?.or) {
         result.push(current);
       } else if (found.or.length === 1) {
@@ -143,19 +149,23 @@ export class ExpressionNormalizer {
     node: TreeNode,
     predicate: (node: TreeNode) => boolean
   ): TreeNode | undefined {
-    let found: TreeNode | undefined;
-
     if (predicate(node)) {
       return node;
     }
     if (node.and) {
-      found = node.and.find((n) => this.findNode(n, predicate));
+      for (const child of node.and) {
+        const found = this.findNode(child, predicate);
+        if (found) return found;
+      }
     }
-    if (!found && node.or) {
-      found = node.or.find((n) => this.findNode(n, predicate));
+    if (node.or) {
+      for (const child of node.or) {
+        const found = this.findNode(child, predicate);
+        if (found) return found;
+      }
     }
 
-    return found;
+    return undefined;
   }
 
   private visit(
