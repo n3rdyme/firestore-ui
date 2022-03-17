@@ -16,7 +16,8 @@ export function AppHeader() {
         className="flex items-center text-white font-bold text-xl sm:text-title space-x-1"
       >
         <img src="/images/firebase_28dp.png" alt="logo" className="h-8" />
-        <span>firebase-ui.com</span>
+        <span>firestore-ui.com</span>
+        <span className="font-mono text-sm">(BETA)</span>
       </Link>
       <div className="flex-grow" />
       <div>
