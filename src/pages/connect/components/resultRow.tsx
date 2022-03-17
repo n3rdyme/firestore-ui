@@ -8,20 +8,20 @@
 
 import React, { useCallback } from "react";
 import { SqlFieldValue } from "../../../services/sqlFieldValue";
-import { SqlValue } from "../../../services/sqlStatement";
+import { SqlColumn } from "../../../services/sqlStatement";
 import { classNames } from "../../../utils/classNames";
 import { patterns } from "../../../utils/patterns";
 
-export interface TableDataProps {
+export interface ResultRowProps {
   row: any;
-  column: SqlValue;
-  openDetails: (row: any, column: SqlValue) => void;
+  column: SqlColumn;
+  showDetail?: (title: string, obj: any, col?: SqlColumn) => void;
 }
 
-export function TableData({ openDetails, row, column }: TableDataProps) {
+export function ResultRow({ showDetail, row, column }: ResultRowProps) {
   const onOpen = useCallback(
-    () => openDetails(row, column),
-    [openDetails, row, column]
+    () => showDetail?.(column.alias ?? column.value, row, column),
+    [showDetail, row, column]
   );
   let value = new SqlFieldValue(column).getValue(row);
   let title: string | undefined;

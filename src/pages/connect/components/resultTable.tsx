@@ -6,28 +6,77 @@
  * ****************************************************************************
  */
 
-import React, { useCallback, useMemo } from "react";
-import { FaExclamationTriangle } from "react-icons/fa";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { ErrorMessage } from "../../../components/cardMessage";
+import { expandSqlColumns } from "../../../services/expandSqlColumns";
 import { SqlFieldValue } from "../../../services/sqlFieldValue";
 import { SqlColumn, SqlStatementResult } from "../../../services/sqlStatement";
-import { classNames } from "../../../utils/classNames";
 import { ModalJsonView } from "./modalJsonView";
-import { TableData } from "./tableData";
 import { TableHeading } from "./tableHeading";
+import { TableRow } from "./tableRow";
+
+interface ExpandableSqlColumn extends SqlColumn {
+  canExpand?: boolean;
+}
 
 export function ResultTable({ results }: { results: SqlStatementResult }) {
   const [viewJsonOf, setViewJsonOf] =
     React.useState<{ title: string; obj: any }>();
   const clearJsonView = useCallback(() => setViewJsonOf(undefined), []);
 
-  const showColumnDetail = useCallback((row: any, col: SqlColumn) => {
-    const data = new SqlFieldValue(col);
-    setViewJsonOf({
-      title: data.aliasName ?? data.fqFieldName,
-      obj: data.getValue(row),
-    });
-  }, []);
+  const [columns, setColumns] = React.useState<ExpandableSqlColumn[]>(() =>
+    results.columns.map((c) => ({ ...c, canExpand: undefined }))
+  );
+  useEffect(
+    () =>
+      setColumns(results.columns.map((c) => ({ ...c, canExpand: undefined }))),
+    [results.columns]
+  );
+
+  const expandable = useMemo(() => {
+    const result = [...columns];
+    let needed = result.map((_, i) => i);
+    for (let ix = 0; ix < results.rows.length && needed.length; ix += 1) {
+      needed = needed.filter((colIx) => {
+        const datum = new SqlFieldValue(result[colIx]).getValue(
+          results.rows[ix]
+        );
+        if (datum == null) {
+          return true;
+        }
+        result[colIx].canExpand =
+          typeof datum === "object" && !(datum instanceof Date);
+        return false;
+      });
+    }
+    return result;
+  }, [columns, results?.rows]);
+
+  const showColumnDetail = useCallback(
+    (title: string, row: any, col?: SqlColumn) => {
+      if (col) {
+        setViewJsonOf({
+          title,
+          obj: new SqlFieldValue(col).getValue(row),
+        });
+      } else if (row) {
+        setViewJsonOf({ title, obj: row });
+      }
+    },
+    []
+  );
+
+  const expandColumn = useCallback(
+    (col: SqlColumn) => {
+      const expandIx = expandable.findIndex((c) => c === col);
+      const newCols = expandSqlColumns(
+        expandable.map((c, ix) => ({ ...c, star: ix === expandIx })),
+        results.rows
+      );
+      setColumns(newCols);
+    },
+    [expandable, results.rows]
+  );
 
   const { unknownErrors, rowToError } = useMemo(
     () => ({
@@ -62,34 +111,26 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
                 <th className="w-1 px-3 bg-navy-50 text-right">
                   <div className="">#</div>
                 </th>
-                {results.columns.map((c) => (
-                  <TableHeading key={c.value} column={c} />
+                {expandable.map((c) => (
+                  <TableHeading
+                    key={c.value}
+                    column={c}
+                    onExpand={c.canExpand ? expandColumn : undefined}
+                  />
                 ))}
                 <th className="w-1/2 border">&nbsp;</th>
               </tr>
             </thead>
             <tbody>
               {results.rows?.map((row, index) => (
-                <tr
-                  key={row.$id ?? index}
-                  className={classNames({ "bg-red-100": !!rowToError[index] })}
-                >
-                  <td className="px-3 bg-navy-50 text-right">{index + 1}</td>
-                  {(results.columns ?? []).map((c) => (
-                    <TableData
-                      key={c.value}
-                      row={row}
-                      column={c}
-                      openDetails={showColumnDetail}
-                    />
-                  ))}
-                  {!!rowToError[index] && (
-                    <td className="w-full px-3 text-danger flex flex-nowrap items-center whitespace-nowrap max-w-none">
-                      <FaExclamationTriangle className="mr-2" />
-                      {rowToError[index]?.message}
-                    </td>
-                  )}
-                </tr>
+                <TableRow
+                  key={row?.$id ?? index}
+                  index={index}
+                  columns={columns}
+                  row={row}
+                  error={rowToError[index]}
+                  showDetail={showColumnDetail}
+                />
               ))}
             </tbody>
           </table>
