@@ -713,7 +713,7 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     if (ctx.not) {
       exp.not = true;
     }
-    return this.visitChildren(ctx);
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#expressionAtomPredicate.

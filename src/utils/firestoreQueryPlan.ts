@@ -84,7 +84,7 @@ export class FirestoreQueryPlan {
     const testGate = (exp: SqlPredicate, doc: any) => {
       const op = sqlComparisonTable[exp.op ?? "??????"];
       if (!op) {
-        console.warn(`Operator not implemented ${exp.op}`);
+        console.warn("Operator not implemented.", exp);
         return false;
       }
       const data = { $id: doc.id, ...doc.data() };
