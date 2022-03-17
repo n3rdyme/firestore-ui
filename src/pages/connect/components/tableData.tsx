@@ -72,7 +72,7 @@ export function TableData({ openDetails, row, column }: TableDataProps) {
           <button
             type="button"
             onClick={onOpen}
-            className="text-xs hover:text-secondary p-0 m-0 px-1 -mr-2 ml-auto"
+            className="text-xs text-gray-400 hover:text-secondary p-0 m-0 px-1 -mr-2 ml-auto"
           >
             &#x2026;
           </button>
