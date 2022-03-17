@@ -668,7 +668,20 @@ export class SqlStatementVisitor extends SqlParserVisitor {
 
   // Visit a parse tree produced by SqlParser#betweenPredicate.
   override visitBetweenPredicate(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+    // left=predicateOperand not=NOT? BETWEEN min=constant AND max=constant
+    const left = this.visitPredicateOperand(ctx.left);
+    const min = this.visitConstant(ctx.min);
+    const max = this.visitConstant(ctx.max);
+    const exp: SqlExpression = {
+      and: [
+        { left, op: ">=", right: min },
+        { left, op: "<=", right: max },
+      ],
+    };
+    if (ctx.not) {
+      exp.not = true;
+    }
+    return exp;
   }
 
   // Visit a parse tree produced by SqlParser#likePredicate.
