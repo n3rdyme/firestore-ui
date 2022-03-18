@@ -255,10 +255,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     }
     if (ctx.values) {
       statement.values = this.visitInsertStatementValue(ctx.values).filter(
-        hasType
+        isDefined
       );
     }
-
     return statement;
   }
 
@@ -321,6 +320,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     } else if (ctx.value) {
       const [value] = this.visitChildren(ctx);
       Object.assign(col, value);
+    } else if (ctx.func) {
+      const funcCall = this.visitFunctionCall(ctx.func);
+      Object.assign(col, funcCall);
     }
 
     if (ctx.alias) {
@@ -456,12 +458,6 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     });
   }
 
-  // Visit a parse tree produced by SqlParser#blockedQuoteId
-  override visitBlockedQuoteId(ctx: ParserRuleContext) {
-    const text = ctx.getText();
-    return text.substring(1, text.length - 1);
-  }
-
   // Visit a parse tree produced by SqlParser#dottedId.
   override visitDottedId(ctx: ParserRuleContext) {
     const [idOrToken, id2] = this.visitChildren(ctx).filter(isDefined);
@@ -587,9 +583,9 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     }));
   }
 
-  // Visit a parse tree produced by SqlParser#constants.
-  override visitConstants(ctx: ParserRuleContext) {
-    return this.visitChildren(ctx);
+  // Visit a parse tree produced by SqlParser#castConstantCall.
+  override visitCastConstantCall(ctx: ParserRuleContext) {
+    return this.visitCastAsFunctionCall(ctx);
   }
 
   override visitWhereExpression(ctx: ParserRuleContext) {
@@ -729,8 +725,14 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     return this.visitChildren(ctx);
   }
 
-  // Visit a parse tree produced by SqlParser#constantValueAtom.
-  override visitConstantValueAtom(ctx: ParserRuleContext) {
+  // Visit a parse tree produced by SqlParser#valueElement.
+  override visitValueElement(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    return value;
+  }
+
+  // Visit a parse tree produced by SqlParser#constOrColumnAtom.
+  override visitConstOrColumnAtom(ctx: ParserRuleContext) {
     const [value] = this.visitChildren(ctx);
     return value;
   }
@@ -779,5 +781,91 @@ export class SqlStatementVisitor extends SqlParserVisitor {
       return "AND";
     }
     return "OR";
+  }
+
+  /**
+   * FUNCTIONS *
+   */
+
+  // Visit a parse tree produced by SqlParser#functionCall.
+  override visitFunctionCall(ctx: ParserRuleContext) {
+    const [funcCall] = this.visitChildren(ctx);
+    return funcCall;
+  }
+
+  // Visit a parse tree produced by SqlParser#castAsFunctionCall.
+  override visitCastAsFunctionCall(ctx: ParserRuleContext) {
+    // : CAST '(' param=constOrColumnAtom AS dataType=convertedDataType ')'
+    // | dataType=convertedDataType '(' param=constOrColumnAtom ')'
+    const param = this.visitConstOrColumnAtom(ctx.param);
+    const dataType = this.visitConvertedDataType(ctx.dataType);
+    const val: SqlValue = {
+      type: "function",
+      value: "cast",
+      params: [param, { type: "string", value: dataType }],
+    };
+
+    return val;
+  }
+
+  // Visit a parse tree produced by SqlParser#convertedDataType.
+  override visitConvertedDataType(
+    ctx: ParserRuleContext
+  ): "string" | "integer" | "number" | "date" | "boolean" | undefined {
+    const datatype = ctx.getText();
+    switch (datatype?.toUpperCase()) {
+      case "TEXT":
+      case "NCHAR":
+      case "CHAR":
+      case "VARCHAR":
+      case "NVARCHAR":
+        return "string";
+      case "DATE":
+      case "DATETIME":
+      case "TIMESTAMP":
+        return "date";
+      case "INT":
+      case "INTEGER":
+        return "integer";
+      case "NUMERIC":
+      case "DECIMAL":
+      case "FLOAT":
+      case "DOUBLE":
+      case "REAL":
+        return "number";
+      case "BOOL":
+      case "BOOLEAN":
+        return "boolean";
+    }
+    return undefined;
+  }
+
+  // Visit a parse tree produced by SqlParser#simpleFunctionCall.
+  override visitSimpleFunctionCall(ctx: ParserRuleContext) {
+    const params: SqlValue[] = [];
+
+    for (let ix = 1; ix < 10; ix += 1) {
+      const arg = ctx[`arg${ix}`];
+      if (!arg) {
+        break;
+      }
+      params.push(this.visitConstOrColumnAtom(arg));
+    }
+
+    const value = GenericSQL.tokenToString(ctx.func.type);
+    if (!value) {
+      throw this.errorWithContext(
+        new Error(`Unknown token id: ${ctx.func.type}`),
+        ctx
+      );
+    }
+
+    const val: SqlValue = {
+      type: "function",
+      value: value.toLowerCase(),
+      params,
+    };
+
+    return val;
   }
 }

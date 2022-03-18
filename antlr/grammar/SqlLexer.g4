@@ -75,6 +75,31 @@ WHERE:                               'WHERE';
 WITH:                                'WITH';
 
 
+// DATA TYPE Keywords
+INT:                                 'INT';
+INTEGER:                             'INTEGER';
+REAL:                                'REAL';
+DOUBLE:                              'DOUBLE';
+FLOAT:                               'FLOAT';
+DECIMAL:                             'DECIMAL';
+NUMERIC:                             'NUMERIC';
+DATE:                                'DATE';
+TIMESTAMP:                           'TIMESTAMP';
+DATETIME:                            'DATETIME';
+CHAR:                                'CHAR';
+NCHAR:                               'NCHAR';
+VARCHAR:                             'VARCHAR';
+NVARCHAR:                            'NVARCHAR';
+TEXT:                                'TEXT';
+BOOL:                                'BOOL';
+BOOLEAN:                             'BOOLEAN';
+
+// Built-in Functions
+
+CAST:                                'CAST';
+IFNULL:                              'IFNULL';
+NOW:                                 'NOW';
+
 // Operators. Arithmetics
 
 STAR:                                '*';
@@ -164,7 +189,7 @@ DOT_ID:                              '.' ID_LITERAL;
 ID:                                  ID_LITERAL;
 DOUBLE_QUOTE_ID:                     DQUOTA_STRING;
 REVERSE_QUOTE_ID:                    BQUOTA_STRING;
-BLOCKED_QUOTE_ID:                    '[' ~(']')* ']';
+// BLOCKED_QUOTE_ID:                    '[' ~(']')* ']';
 STRING_USER_NAME:                    (
                                        SQUOTA_STRING | DQUOTA_STRING
                                        | BQUOTA_STRING | ID_LITERAL

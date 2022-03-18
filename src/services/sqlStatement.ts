@@ -39,11 +39,15 @@ export interface SqlValue {
     | "number"
     | "hexadecimal"
     | "boolean"
+    | "date"
+    | "function"
     | "null"
     | "default";
   value: string;
   valueNum?: number;
   valueBool?: boolean;
+  valueDate?: Date;
+  params?: SqlValue[];
 }
 
 export interface SqlPredicate {

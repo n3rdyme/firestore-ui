@@ -162,12 +162,6 @@ SqlParserVisitor.prototype.visitReverseQuoteId = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#blockedQuoteId.
-SqlParserVisitor.prototype.visitBlockedQuoteId = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by SqlParser#simpleId.
 SqlParserVisitor.prototype.visitSimpleId = function(ctx) {
   return this.visitChildren(ctx);
@@ -228,20 +222,20 @@ SqlParserVisitor.prototype.visitConstant = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#constantOrDefault.
-SqlParserVisitor.prototype.visitConstantOrDefault = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by SqlParser#fullColumnNameList.
 SqlParserVisitor.prototype.visitFullColumnNameList = function(ctx) {
   return this.visitChildren(ctx);
 };
 
 
-// Visit a parse tree produced by SqlParser#constants.
-SqlParserVisitor.prototype.visitConstants = function(ctx) {
+// Visit a parse tree produced by SqlParser#castConstantCall.
+SqlParserVisitor.prototype.visitCastConstantCall = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#constantOrDefault.
+SqlParserVisitor.prototype.visitConstantOrDefault = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -330,8 +324,14 @@ SqlParserVisitor.prototype.visitPredicateOperand = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#constantValueAtom.
-SqlParserVisitor.prototype.visitConstantValueAtom = function(ctx) {
+// Visit a parse tree produced by SqlParser#valueElement.
+SqlParserVisitor.prototype.visitValueElement = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#constOrColumnAtom.
+SqlParserVisitor.prototype.visitConstOrColumnAtom = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -368,6 +368,30 @@ SqlParserVisitor.prototype.visitComparisonOperator = function(ctx) {
 
 // Visit a parse tree produced by SqlParser#logicalOperator.
 SqlParserVisitor.prototype.visitLogicalOperator = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#functionCall.
+SqlParserVisitor.prototype.visitFunctionCall = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#castAsFunctionCall.
+SqlParserVisitor.prototype.visitCastAsFunctionCall = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#convertedDataType.
+SqlParserVisitor.prototype.visitConvertedDataType = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#simpleFunctionCall.
+SqlParserVisitor.prototype.visitSimpleFunctionCall = function(ctx) {
   return this.visitChildren(ctx);
 };
 

@@ -21,4 +21,20 @@ export class GenericSQL extends BasicParser {
     const tokenStream = new CommonTokenStream(lexer);
     return new SqlParser(tokenStream) as any;
   }
+
+  private static tokenMap: { [key: number]: string } | undefined;
+
+  static tokenToString(token: number): string | undefined {
+    if (!GenericSQL.tokenMap) {
+      GenericSQL.tokenMap = Object.keys(SqlLexer).reduce((acc, key) => {
+        const value = (SqlLexer as any)[key];
+        if (typeof value === "number") {
+          return { ...acc, [value]: key };
+        }
+        return acc;
+      }, GenericSQL.tokenMap || {});
+    }
+
+    return GenericSQL.tokenMap[token];
+  }
 }

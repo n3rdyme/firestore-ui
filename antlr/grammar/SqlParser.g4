@@ -74,7 +74,7 @@ updateStatement
     ;
 
 updatedElement
-    : fullColumnName '=' (constOrColumnAtom | isDefault=DEFAULT)
+    : fullColumnName '=' (valueElement | isDefault=DEFAULT)
     ;
 
 /** DELETE */
@@ -100,6 +100,7 @@ selectElement
     : starOf=fullId '.' '*'
     | column=fullColumnName (AS? alias=uid)?
     | value=constant (AS? alias=uid)?
+    | func=functionCall (AS? alias=uid)?
     ;
 
 /** SHARED */
@@ -144,7 +145,7 @@ uid
     : simpleId
     | doubleQuoteId
     | reverseQuoteId
-    | blockedQuoteId
+    // | blockedQuoteId
     // | CHARSET_REVERSE_QOUTE_STRING
     ;
 
@@ -154,10 +155,6 @@ doubleQuoteId
     
 reverseQuoteId
     : REVERSE_QUOTE_ID
-    ;
-    
-blockedQuoteId
-    : BLOCKED_QUOTE_ID
     ;
 
 simpleId
@@ -207,18 +204,21 @@ constant
     | nullLiteral
     ;
 
-constantOrDefault
-    : constant | isDefault=DEFAULT
-    ;
-    
 fullColumnNameList
     : fullColumnName (',' fullColumnName)*
     ;
 
-constants
-    : constant (',' constant)*
+castConstantCall
+    : CAST '(' param=constant AS dataType=convertedDataType ')'
+    | dataType=convertedDataType '(' param=constant ')'
     ;
 
+constantOrDefault
+    : constant 
+    | functionCall
+    | isDefault=DEFAULT
+    ;
+    
 constantsOrDefaults
     : constantOrDefault (',' constantOrDefault)*
     ;
@@ -248,12 +248,22 @@ constantAtoms
     ;
 
 predicateOperand
-    : constOrColumnAtom
+    : valueElement
+    ;
+
+valueElement
+    : constant
+    | columnElement
+    | functionCall
     ;
 
 constOrColumnAtom
-    : constant                                                      #constantValueAtom
-    | fullColumnName                                                #fullColumnNameValueAtom
+    : constant
+    | columnElement
+    ;
+
+columnElement
+    : fullColumnName                                                #fullColumnNameValueAtom
     ;
 
 expressionAtom
@@ -270,4 +280,29 @@ comparisonOperator
 
 logicalOperator
     : AND | '&' '&' | OR | '|' '|' //  | XOR
+    ;
+
+// Built-in functions
+
+functionCall
+    : castAsFunctionCall
+    | simpleFunctionCall
+    ;
+
+castAsFunctionCall
+    : CAST '(' param=constOrColumnAtom AS dataType=convertedDataType ')'
+    | dataType=convertedDataType '(' param=constOrColumnAtom ')'
+  ;
+
+convertedDataType
+    : typeName=
+    ( TEXT | NCHAR | CHAR | VARCHAR | NVARCHAR 
+    | DATE | DATETIME | TIMESTAMP 
+    | NUMERIC | DECIMAL | INT | INTEGER | FLOAT | DOUBLE | REAL
+    | BOOL | BOOLEAN
+    );
+
+simpleFunctionCall
+    : func=IFNULL '(' arg1=constOrColumnAtom ',' arg2=constOrColumnAtom ')' |
+    | func=NOW '(' ')'
     ;
