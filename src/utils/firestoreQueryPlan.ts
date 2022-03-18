@@ -255,8 +255,7 @@ export class FirestoreQueryPlan {
       });
     }
 
-    if (criteria.or[0].and.length === 1) {
-      const c = criteria.or[0].and[0];
+    for (const c of criteria.or[0].and) {
       if (
         c.left &&
         c.right &&
@@ -267,8 +266,20 @@ export class FirestoreQueryPlan {
         const lhs = new SqlFieldValue(c.left!);
         const rhs = new SqlFieldValue(c.right!);
         // console.debug("where", [lhs.fqFieldName, "==", rhs.value]);
-        const op = c.op === "=" ? "==" : c.op;
-        return [where(lhs.fqFieldName, op as any, rhs.value)];
+        const op = (
+          {
+            "=": "==",
+            "!=": "!=",
+            ">": ">",
+            "<": "<",
+            ">=": ">=",
+            "<=": "<=",
+          } as any
+        )[(c.op ?? "") as any];
+
+        if (op) {
+          return [where(lhs.fqFieldName, op as any, rhs.value)];
+        }
       }
     }
 
