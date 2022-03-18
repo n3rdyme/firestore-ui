@@ -144,12 +144,6 @@ SqlParserVisitor.prototype.visitFullColumnName = function(ctx) {
 };
 
 
-// Visit a parse tree produced by SqlParser#engineName.
-SqlParserVisitor.prototype.visitEngineName = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by SqlParser#uid.
 SqlParserVisitor.prototype.visitUid = function(ctx) {
   return this.visitChildren(ctx);
@@ -374,48 +368,6 @@ SqlParserVisitor.prototype.visitComparisonOperator = function(ctx) {
 
 // Visit a parse tree produced by SqlParser#logicalOperator.
 SqlParserVisitor.prototype.visitLogicalOperator = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#charsetNameBase.
-SqlParserVisitor.prototype.visitCharsetNameBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#transactionLevelBase.
-SqlParserVisitor.prototype.visitTransactionLevelBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#privilegesBase.
-SqlParserVisitor.prototype.visitPrivilegesBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#intervalTypeBase.
-SqlParserVisitor.prototype.visitIntervalTypeBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#dataTypeBase.
-SqlParserVisitor.prototype.visitDataTypeBase = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#keywordsCanBeId.
-SqlParserVisitor.prototype.visitKeywordsCanBeId = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by SqlParser#functionNameBase.
-SqlParserVisitor.prototype.visitFunctionNameBase = function(ctx) {
   return this.visitChildren(ctx);
 };
 
