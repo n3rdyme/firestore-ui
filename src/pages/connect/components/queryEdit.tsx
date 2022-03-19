@@ -5,11 +5,13 @@
  * Created On: March 9th, 2022
  * ****************************************************************************
  */
-import React from "react";
-import Editor from "@monaco-editor/react";
+import React, { useEffect } from "react";
+import Editor, { useMonaco } from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { CardMessage } from "../../../components/cardMessage";
 import { ParserError } from "../../../services/sqlParser";
+import { sqlConfig } from "./sqlj/sqljConfig";
+import { conf, language } from "./sqlj/sqlj";
 
 export interface QueryEditProps {
   value: string | undefined;
@@ -17,12 +19,28 @@ export interface QueryEditProps {
   onChange: (query: string | undefined) => void;
 }
 export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
+  const monaco = useMonaco();
+  const [ready, setReady] = React.useState(false);
+  useEffect(() => {
+    if (monaco && !ready) {
+      console.log("setup language for monaco");
+      monaco.languages.register(sqlConfig);
+      monaco.languages.setLanguageConfiguration("sqlj", conf);
+      monaco.languages.setMonarchTokensProvider("sqlj", language);
+      setReady(true);
+    }
+  }, [monaco, ready]);
+
+  if (!ready) {
+    return null;
+  }
+
   return (
     <div className="flex-grow flex flex-col">
       <div className="flex flex-col flex-grow relative overflow-clip">
         <Editor
           className="absolute top-0 left-0 right-0 bottom-0 border"
-          defaultLanguage="sql"
+          language="sqlj"
           defaultValue="/* Enter your sql query here */"
           options={{
             minimap: { enabled: false },

@@ -12,7 +12,7 @@ import { SqlParser } from "../lib/SqlParser";
 import BasicParser from "./common/basicParser";
 
 export class GenericSQL extends BasicParser {
-  public createLexer(input: string): Lexer {
+  public createLexer(input: string): Lexer & SqlLexer {
     const chars = new CaseInsensitiveStream(input); // Some Lexer only support uppercase token, So you need transform
     return new SqlLexer(chars) as any;
   }
