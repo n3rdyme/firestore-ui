@@ -40,13 +40,9 @@ type SqlStatementQuery = Pick<
 >;
 
 export class FirestoreQueryPlan {
-  private collection: CollectionReference<DocumentData>;
-
   private totalRecords = 0;
 
-  constructor(private readonly fs: Firestore, readonly collectionName: string) {
-    this.collection = collection(this.fs, collectionName);
-  }
+  constructor(private readonly fs: Firestore) {}
 
   public get recordsScanned() {
     return this.totalRecords;
@@ -176,6 +172,19 @@ export class FirestoreQueryPlan {
   private async getDocumentsFromQuery(
     statement: SqlStatementQuery
   ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
+    if (!statement.table?.[0]?.name) {
+      return [
+        {
+          id: null as any,
+          data: () => ({}),
+          ref: null as any,
+          metadata: null as any,
+          exists: () => false,
+          get: () => undefined,
+        },
+      ];
+    }
+
     // single query execution
     const constraints = [
       ...this.getQuery(statement),
@@ -183,7 +192,8 @@ export class FirestoreQueryPlan {
       ...this.getLimits(statement),
     ];
 
-    const q = query(this.collection, ...constraints);
+    const coll = collection(this.fs, statement.table?.[0]?.name ?? "ignore");
+    const q = query(coll, ...constraints);
     const documents = await getDocs(q);
 
     this.totalRecords += documents.size;

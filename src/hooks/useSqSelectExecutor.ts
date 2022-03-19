@@ -27,9 +27,9 @@ export function useSqlSelectExecutor() {
       }
 
       const { table, columns } = statement;
-      if (!table?.[0].name || !columns?.length) {
+      if (!columns?.length) {
         console.error("Invalid statement", statement);
-        throw new Error("Expected select with table and columns.");
+        throw new Error("Expected select with columns.");
       }
 
       const result: SqlStatementResult = {
@@ -41,7 +41,7 @@ export function useSqlSelectExecutor() {
         recordsFetched: 0,
       };
 
-      const fsQuery = new FirestoreQueryPlan(fs, table[0].name);
+      const fsQuery = new FirestoreQueryPlan(fs);
       const found = await fsQuery.execute(statement);
 
       result.rows = found.map((doc) => ({
