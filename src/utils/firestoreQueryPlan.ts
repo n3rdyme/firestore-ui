@@ -22,6 +22,7 @@ import {
 import { sqlComparisonTable } from "../services/sqlComparisons";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 import {
+  DOTTED_ID_SPLIT,
   SqlColumn,
   SqlNormalExpression,
   SqlNormalizedAnd,
@@ -344,9 +345,15 @@ export class FirestoreQueryPlan {
       const result = criteria.common.filter(
         (c) =>
           c.left?.type === "column" &&
+          // Firestore does not support equality on all nested types
+          !DOTTED_ID_SPLIT.test(c.left?.value) &&
+          // Firestore does not support equality on the following cases
           c.right?.type !== "default" &&
           c.right?.type !== "null" &&
-          c.right?.type !== "column"
+          c.right?.type !== "column" &&
+          c.right?.type !== "function" &&
+          c.right?.type !== "object" &&
+          c.right?.type !== "array"
       );
       return result;
     }
