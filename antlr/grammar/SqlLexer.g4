@@ -69,12 +69,10 @@ SELECT:                              'SELECT';
 SET:                                 'SET';
 TRUE:                                'TRUE';
 UPDATE:                              'UPDATE';
-VALUE:                              'VALUE';
+VALUE:                               'VALUE';
 VALUES:                              'VALUES';
 WHERE:                               'WHERE';
 WITH:                                'WITH';
-
-
 // DATA TYPE Keywords
 INT:                                 'INT';
 INTEGER:                             'INTEGER';
@@ -99,6 +97,9 @@ BOOLEAN:                             'BOOLEAN';
 CAST:                                'CAST';
 IFNULL:                              'IFNULL';
 NOW:                                 'NOW';
+
+// JSON Support
+UNDEFINED:                           'UNDEFINED';
 
 // Operators. Arithmetics
 
@@ -173,7 +174,11 @@ NULL_SPEC_LITERAL:                   '\\' 'N';
 BIT_STRING:                          BIT_STRING_L;
 // STRING_CHARSET_NAME:                 '_' CHARSET_NAME;
 
-
+// For embeded json support
+BLOCK_QUOTE_OPEN:                    '[';
+BLOCK_QUOTE_CLOSE:                   ']';
+CODE_QUOTE_OPEN:                     '{';
+CODE_QUOTE_CLOSE:                    '}';
 
 
 // Hack for dotID
@@ -215,15 +220,15 @@ GLOBAL_ID:                           '@' '@'
 // Fragments for Literal primitives
 
 fragment EXPONENT_NUM_PART:          'E' [-+]? DEC_DIGIT+;
-fragment ID_LITERAL:                 [A-Z_$0-9]*?[A-Z_$]+?[A-Z_$0-9]*;
+// fragment ID_LITERAL:                 [A-Z_$0-9]*?[A-Z_$]+?[A-Z_$0-9]*;
+// Restricted to match identifier in json as well as sql...
+fragment ID_LITERAL:                 [A-Z_$]+?[A-Z_$0-9]*;
 fragment DQUOTA_STRING:              '"' ( '\\'. | '""' | ~('"'| '\\') )* '"';
 fragment SQUOTA_STRING:              '\'' ('\\'. | '\'\'' | ~('\'' | '\\'))* '\'';
 fragment BQUOTA_STRING:              '`' ( '\\'. | '``' | ~('`'|'\\'))* '`';
 fragment HEX_DIGIT:                  [0-9A-F];
 fragment DEC_DIGIT:                  [0-9];
 fragment BIT_STRING_L:               'B' '\'' [01]+ '\'';
-
-
 
 // Last tokens must generate Errors
 

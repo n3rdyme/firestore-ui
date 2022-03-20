@@ -40,7 +40,15 @@ export class SqlFieldValue {
     return this.data.value.split(DOTTED_ID_SPLIT).join(".");
   }
 
-  public get value(): string | number | boolean | Date | null | undefined {
+  public get value():
+    | string
+    | number
+    | boolean
+    | Date
+    | any[]
+    | { [key: string]: any }
+    | null
+    | undefined {
     if (this.isField) {
       throw new Error("The field references a column, not a value.");
     }
@@ -58,6 +66,12 @@ export class SqlFieldValue {
     }
     if (this.data.type === "date") {
       return this.data.valueDate ?? new Date(this.data.value);
+    }
+    if (this.data.type === "array") {
+      return this.data.valueArray ?? [];
+    }
+    if (this.data.type === "object") {
+      return this.data.valueObject ?? {};
     }
     if (this.data.type === "null") {
       return null;
@@ -109,7 +123,9 @@ export class SqlFieldValue {
     if (!this.isField && !this.isFunc) {
       return this.value;
     }
+
     if (!this.data.value) {
+      console.error("Invalid field value:", this.data);
       throw new Error("Column name is required for insert/update.");
     }
 

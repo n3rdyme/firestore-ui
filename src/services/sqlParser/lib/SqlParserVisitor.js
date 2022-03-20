@@ -396,5 +396,65 @@ SqlParserVisitor.prototype.visitSimpleFunctionCall = function(ctx) {
 };
 
 
+// Visit a parse tree produced by SqlParser#jsonData.
+SqlParserVisitor.prototype.visitJsonData = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonObject.
+SqlParserVisitor.prototype.visitJsonObject = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonField.
+SqlParserVisitor.prototype.visitJsonField = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonId.
+SqlParserVisitor.prototype.visitJsonId = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonArray.
+SqlParserVisitor.prototype.visitJsonArray = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonArrayItem.
+SqlParserVisitor.prototype.visitJsonArrayItem = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonValue.
+SqlParserVisitor.prototype.visitJsonValue = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonString.
+SqlParserVisitor.prototype.visitJsonString = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonPrimitive.
+SqlParserVisitor.prototype.visitJsonPrimitive = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by SqlParser#jsonUndefined.
+SqlParserVisitor.prototype.visitJsonUndefined = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 
 exports.SqlParserVisitor = SqlParserVisitor;

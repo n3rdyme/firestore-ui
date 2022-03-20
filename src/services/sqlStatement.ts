@@ -42,11 +42,15 @@ export interface SqlValue {
     | "date"
     | "function"
     | "null"
-    | "default";
+    | "default"
+    | "array"
+    | "object";
   value: string;
   valueNum?: number;
   valueBool?: boolean;
   valueDate?: Date;
+  valueArray?: any[];
+  valueObject?: any;
   params?: SqlValue[];
 }
 

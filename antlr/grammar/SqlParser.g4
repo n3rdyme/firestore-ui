@@ -101,6 +101,7 @@ selectElement
     | column=fullColumnName (AS? alias=uid)?
     | value=constant (AS? alias=uid)?
     | func=functionCall (AS? alias=uid)?
+    | json=jsonData (AS? alias=uid)?
     ;
 
 /** SHARED */
@@ -185,8 +186,7 @@ hexadecimalLiteral
     : HEXADECIMAL_LITERAL;
 
 constNumberLiteral
-    : 
-    | decimalLiteral
+    : decimalLiteral
     | negative='-' decimalLiteral
     | REAL_LITERAL
     | negative='-' REAL_LITERAL
@@ -216,6 +216,7 @@ castConstantCall
 constantOrDefault
     : constant 
     | functionCall
+    | jsonData
     | isDefault=DEFAULT
     ;
     
@@ -255,6 +256,7 @@ valueElement
     : constant
     | columnElement
     | functionCall
+    | jsonData
     ;
 
 constOrColumnAtom
@@ -306,3 +308,59 @@ simpleFunctionCall
     : func=IFNULL '(' arg1=constOrColumnAtom ',' arg2=constOrColumnAtom ')' |
     | func=NOW '(' ')'
     ;
+
+/**
+  * BEGIN JSON FORMAT
+  */
+  
+jsonData
+   : jsonObject
+   | jsonArray
+   ;
+
+jsonObject
+   : '{' jsonField (',' jsonField)* ','? '}'
+   | '{' '}'
+   ;
+
+jsonField
+   : key=jsonId ':' value=jsonValue
+   ;
+
+jsonId
+    : jsonString
+    | ID
+    ;
+
+jsonArray
+   : '[' jsonArrayItem (',' jsonArrayItem)* ']'
+   | '[' ']'
+   ;
+
+jsonArrayItem
+   : jsonValue | /* missing */
+   ;
+
+jsonValue
+   : jsonObject
+   | jsonArray
+   | jsonPrimitive
+   ;
+
+jsonString
+   : stringLiteral
+   | doubleQuoteId
+   ;
+
+jsonPrimitive
+    : jsonString 
+    | constNumberLiteral
+    | hexadecimalLiteral 
+    | booleanLiteral
+    | nullLiteral
+    | jsonUndefined
+    ;
+
+jsonUndefined
+   : UNDEFINED
+   ;    

@@ -19,6 +19,10 @@ import { SqlLexer } from "../sqlParser/lib/SqlLexer";
 export class SqljDocTokenizer
   implements languages.DocumentSemanticTokensProvider
 {
+  private $jsonNesting: string[] = [];
+
+  private $lastDelimiter = "";
+
   onDidChange?: IEvent<void> | undefined;
 
   getLegend(): languages.SemanticTokensLegend {
@@ -33,8 +37,11 @@ export class SqljDocTokenizer
         "operator.sql",
         "predefined.sql",
         "error.sql",
+        // json...
+        "keyword.json",
+        "string.json",
       ],
-      tokenModifiers: ["none"],
+      tokenModifiers: ["declaration"],
     };
   }
 
@@ -53,8 +60,9 @@ export class SqljDocTokenizer
       4. Token type index (0-indexed into the tokenTypes array defined in getLegend)
       5. Modifier index (0-indexed into the tokenModifiers array defined in getLegend)
     */
-    /** @type {number[]} */
-    const data = [];
+    this.$jsonNesting = [];
+    this.$lastDelimiter = "";
+    const data: number[] = [];
 
     let prevLine = 0;
     let prevChar = 0;
@@ -124,6 +132,9 @@ export class SqljDocTokenizer
       operator: 6,
       predefined: 7,
       error: 8,
+      // json...
+      jidentifier: 9,
+      jstring: 10,
     };
 
     switch (type) {
@@ -184,9 +195,30 @@ export class SqljDocTokenizer
 
       case SqlLexer.LR_BRACKET:
       case SqlLexer.RR_BRACKET:
-      case SqlLexer.COMMA:
       case SqlLexer.SEMI:
+        return map.delimiter;
+
+      case SqlLexer.COMMA:
+        this.$lastDelimiter = ",";
+        return map.delimiter;
       case SqlLexer.COLON_SYMB:
+        this.$lastDelimiter = ":";
+        return map.delimiter;
+      case SqlLexer.BLOCK_QUOTE_OPEN:
+        this.$jsonNesting.push("[");
+        this.$lastDelimiter = "[";
+        return map.delimiter;
+      case SqlLexer.BLOCK_QUOTE_CLOSE:
+        this.$jsonNesting.pop();
+        this.$lastDelimiter = "]";
+        return map.delimiter;
+      case SqlLexer.CODE_QUOTE_OPEN:
+        this.$jsonNesting.push("{");
+        this.$lastDelimiter = "{";
+        return map.delimiter;
+      case SqlLexer.CODE_QUOTE_CLOSE:
+        this.$lastDelimiter = "}";
+        this.$jsonNesting.pop();
         return map.delimiter;
 
       // case SqlLexer.AT_SIGN:
@@ -202,27 +234,49 @@ export class SqljDocTokenizer
         return map.number;
 
       case SqlLexer.SINGLE_QUOTE_SYMB:
+      case SqlLexer.START_NATIONAL_STRING_LITERAL:
+      case SqlLexer.BIT_STRING:
         return map.string;
 
       case SqlLexer.DOUBLE_QUOTE_SYMB:
       case SqlLexer.REVERSE_QUOTE_SYMB:
         return map.identifier;
 
-      case SqlLexer.START_NATIONAL_STRING_LITERAL:
       case SqlLexer.STRING_LITERAL:
-      case SqlLexer.BIT_STRING:
-        return map.string;
+        return this.$jsonNesting.length > 0 ? map.jstring : map.string;
+
       case SqlLexer.NULL_SPEC_LITERAL:
         return map.operator;
 
       case SqlLexer.DOT_ID:
-      case SqlLexer.ID:
-      case SqlLexer.DOUBLE_QUOTE_ID:
-      case SqlLexer.REVERSE_QUOTE_ID:
       case SqlLexer.LOCAL_ID:
       case SqlLexer.GLOBAL_ID:
         return map.identifier;
 
+      case SqlLexer.ID: {
+        if (this.$jsonNesting.length > 0) {
+          const lastDelimiter = this.$lastDelimiter;
+          const isObject =
+            this.$jsonNesting[this.$jsonNesting.length - 1] === "{";
+          const isIdentifier =
+            isObject && (lastDelimiter === "{" || lastDelimiter === ",");
+          return isIdentifier ? map.jidentifier : map.identifier;
+        }
+        return map.identifier;
+      }
+
+      case SqlLexer.DOUBLE_QUOTE_ID:
+      case SqlLexer.REVERSE_QUOTE_ID: {
+        if (this.$jsonNesting.length > 0) {
+          const lastDelimiter = this.$lastDelimiter;
+          const isObject =
+            this.$jsonNesting[this.$jsonNesting.length - 1] === "{";
+          const isIdentifier =
+            isObject && (lastDelimiter === "{" || lastDelimiter === ",");
+          return isIdentifier ? map.jidentifier : map.jstring;
+        }
+        return map.identifier;
+      }
       case SqlLexer.ERROR_RECONGNIGION:
       case SqlLexer.ERRORCHANNEL:
         return map.error;
