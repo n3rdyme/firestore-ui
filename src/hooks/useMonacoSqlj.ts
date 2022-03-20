@@ -7,9 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { useMonaco } from "@monaco-editor/react";
-import { sqlConfig } from "../services/sqlj/sqljConfig";
-import { conf } from "../services/sqlj/sqlj";
-import { SqljDocTokenizer } from "../services/sqlj/sqljDocTokenizer";
+import { sqlj } from "../services/sqlj/sqljConfig";
 
 const global = {
   initialized: false,
@@ -21,13 +19,7 @@ export function useMonacoSqlj() {
 
   useEffect(() => {
     if (monaco && !ready) {
-      monaco.languages.register(sqlConfig);
-      monaco.languages.setLanguageConfiguration("sqlj", conf);
-      monaco.languages.registerDocumentSemanticTokensProvider(
-        "sqlj",
-        new SqljDocTokenizer()
-      );
-
+      sqlj.register(monaco);
       global.initialized = true;
       setReady(true);
     }
