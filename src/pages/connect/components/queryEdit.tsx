@@ -11,7 +11,8 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { CardMessage } from "../../../components/cardMessage";
 import { ParserError } from "../../../services/sqlParser";
 import { sqlConfig } from "./sqlj/sqljConfig";
-import { conf, language } from "./sqlj/sqlj";
+import { conf } from "./sqlj/sqlj";
+import { SqljDocTokenizer } from "./sqlj/sqljDocTokenizer";
 
 export interface QueryEditProps {
   value: string | undefined;
@@ -26,7 +27,11 @@ export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
       console.log("setup language for monaco");
       monaco.languages.register(sqlConfig);
       monaco.languages.setLanguageConfiguration("sqlj", conf);
-      monaco.languages.setMonarchTokensProvider("sqlj", language);
+      monaco.languages.registerDocumentSemanticTokensProvider(
+        "sqlj",
+        new SqljDocTokenizer()
+      );
+
       setReady(true);
     }
   }, [monaco, ready]);
@@ -44,6 +49,7 @@ export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
           defaultValue="/* Enter your sql query here */"
           options={{
             minimap: { enabled: false },
+            "semanticHighlighting.enabled": true,
           }}
           value={value}
           onChange={onChange}
