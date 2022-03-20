@@ -13,8 +13,8 @@ import type {
   IEvent,
   languages,
 } from "monaco-editor";
-import { GenericSQL } from "../../../../services/sqlParser";
-import { SqlLexer } from "../../../../services/sqlParser/lib/SqlLexer";
+import { GenericSQL } from "../sqlParser";
+import { SqlLexer } from "../sqlParser/lib/SqlLexer";
 
 export class SqljDocTokenizer
   implements languages.DocumentSemanticTokensProvider
@@ -85,6 +85,8 @@ export class SqljDocTokenizer
 
       const mappedType = this.mapTokenType(token.channel, token.type);
 
+      // This sux, but we have to split the text run into multiple runs
+      // if it spans multiple lines.
       let maxLine = lineLengths[lineIx];
       for (; length + charOffset > maxLine; maxLine = lineLengths[lineIx]) {
         data.push(
@@ -219,8 +221,6 @@ export class SqljDocTokenizer
       case SqlLexer.ID:
       case SqlLexer.DOUBLE_QUOTE_ID:
       case SqlLexer.REVERSE_QUOTE_ID:
-        return map.identifier;
-
       case SqlLexer.LOCAL_ID:
       case SqlLexer.GLOBAL_ID:
         return map.identifier;
