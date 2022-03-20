@@ -33,6 +33,7 @@ export function ResultPanel({
   return (
     <div className="flex flex-grow flex-col">
       <ResultToolbar
+        results={results}
         resultType={resultType}
         setResultType={setResultType}
         onClose={onClose}

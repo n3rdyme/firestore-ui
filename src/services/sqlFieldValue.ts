@@ -144,7 +144,11 @@ export class SqlFieldValue {
       }
 
       if (ix === parts.length - 1) {
-        return data[key];
+        const result = data[key];
+        if (result?.toDate) {
+          return result.toDate();
+        }
+        return result;
       }
 
       if (!data[key]) {
