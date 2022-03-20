@@ -79,13 +79,11 @@ function coerceTypeCompare(cmp: (a: any, b: any) => boolean | undefined) {
   return (inA: any, inB: any): boolean | undefined => {
     let a = inA;
     let b = inB;
-    if (a != null && typeof a === "object") {
-      if (a.toDate) a = a.toDate();
-      if (a instanceof Date) a = a.toISOString();
+    if (a instanceof Date) {
+      a = a.toISOString();
     }
-    if (b != null && typeof b === "object") {
-      if (b.toDate) b = b.toDate();
-      if (b instanceof Date) b = b.toISOString();
+    if (b instanceof Date) {
+      b = b.toISOString();
     }
     if (typeof a === "number" && typeof b === "string") {
       a = a.toString();

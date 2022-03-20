@@ -46,7 +46,7 @@ export function useSqlSelectExecutor() {
 
       result.rows = found.map((doc) => ({
         $id: doc.id,
-        ...doc.data(),
+        ...doc.data,
       }));
 
       result.recordsAffected = result.rows.length;

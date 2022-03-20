@@ -50,7 +50,7 @@ export function useSqlDeleteExecutor() {
       result.rows = await promiseParallel(
         found,
         async (doc, rowIndex) => {
-          const data = doc.data();
+          const { data } = doc;
 
           try {
             await deleteDoc(doc.ref);

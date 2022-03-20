@@ -30,10 +30,6 @@ export function ResultRow({ showDetail, row, column }: ResultRowProps) {
   let width = "w-8";
   let expand = false;
 
-  if (value?.toDate) {
-    value = value.toDate();
-  }
-
   if (value instanceof Date || patterns.isoDateTime.test(value)) {
     title = new Date(value).toISOString();
     value = new Date(value).toLocaleString();

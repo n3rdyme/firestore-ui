@@ -56,7 +56,7 @@ export function useSqlUpdateExecutor() {
       result.rows = await promiseParallel(
         found,
         async (doc, rowIndex) => {
-          const data = doc.data();
+          const { data } = doc;
 
           try {
             for (let ix = 0; ix < columns.length; ix++) {
