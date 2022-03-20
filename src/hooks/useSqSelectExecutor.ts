@@ -26,7 +26,7 @@ export function useSqlSelectExecutor() {
         throw new Error("Expected select statement");
       }
 
-      const { table, columns } = statement;
+      const { columns } = statement;
       if (!columns?.length) {
         console.error("Invalid statement", statement);
         throw new Error("Expected select with columns.");

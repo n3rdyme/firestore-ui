@@ -17,7 +17,6 @@ import {
   where,
   getDocs,
   DocumentData,
-  CollectionReference,
   QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { sqlComparisonTable } from "../services/sqlComparisons";
