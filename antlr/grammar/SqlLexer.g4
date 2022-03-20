@@ -33,7 +33,7 @@ SPACE:                               [ \t\r\n]+    -> channel(HIDDEN);
 SPEC_MYSQL_COMMENT:                  '/*!' .+? '*/' -> channel(MYSQLCOMMENT);
 COMMENT_INPUT:                       '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:                        (
-                                       ('-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF)
+                                       ('//' | '-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF)
                                        | '--' ('\r'? '\n' | EOF)
                                      ) -> channel(HIDDEN);
 
@@ -103,9 +103,9 @@ NOW:                                 'NOW';
 // Operators. Arithmetics
 
 STAR:                                '*';
-// DIVIDE:                              '/';
-// MODULE:                              '%';
-// PLUS:                                '+';
+DIVIDE:                              '/';
+MODULE:                              '%';
+PLUS:                                '+';
 MINUSMINUS:                          '--';
 MINUS:                               '-';
 // DIV:                                 'DIV';

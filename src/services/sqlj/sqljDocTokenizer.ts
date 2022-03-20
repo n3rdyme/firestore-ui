@@ -169,30 +169,28 @@ export class SqljDocTokenizer
       case SqlLexer.PLUS:
       case SqlLexer.MINUSMINUS:
       case SqlLexer.MINUS:
-      case SqlLexer.DIV:
-      case SqlLexer.MOD:
       case SqlLexer.EQUAL_SYMBOL:
       case SqlLexer.GREATER_SYMBOL:
       case SqlLexer.LESS_SYMBOL:
       case SqlLexer.EXCLAMATION_SYMBOL:
-      case SqlLexer.BIT_NOT_OP:
       case SqlLexer.BIT_OR_OP:
       case SqlLexer.BIT_AND_OP:
-      case SqlLexer.BIT_XOR_OP:
       case SqlLexer.DOT:
+        // case SqlLexer.DIV:
+        // case SqlLexer.MOD:
+        // case SqlLexer.BIT_NOT_OP:
+        // case SqlLexer.BIT_XOR_OP:
         return map.operator;
 
       case SqlLexer.LR_BRACKET:
       case SqlLexer.RR_BRACKET:
-        return map.delimiter;
-
       case SqlLexer.COMMA:
       case SqlLexer.SEMI:
       case SqlLexer.COLON_SYMB:
         return map.delimiter;
 
-      case SqlLexer.AT_SIGN:
-        return map.identifier;
+      // case SqlLexer.AT_SIGN:
+      //   return map.identifier;
 
       case SqlLexer.ZERO_DECIMAL:
       case SqlLexer.ONE_DECIMAL:
