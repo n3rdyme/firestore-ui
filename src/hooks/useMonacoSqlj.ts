@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from "react";
 import { useMonaco } from "@monaco-editor/react";
-import { sqlj } from "../services/sqlj/sqljConfig";
+import { sqlj } from "../services/sqlj/sqljLangage";
 
 const global = {
   initialized: false,
