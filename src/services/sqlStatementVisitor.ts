@@ -22,11 +22,14 @@ import {
 } from "./sqlStatement";
 import { ExpressionNormalizer } from "./expressionNormalizer";
 import { mapSynonymOperations } from "./sqlComparisons";
+import { SqlFieldValue } from "./sqlFieldValue";
 
 type ParserRuleContext = AParserRuleContext & { [key: string]: any };
 
 const hasType = (obj: any) => !!obj?.type;
 const isDefined = (obj: any) => !!obj;
+const isJsonValue = (o: any) =>
+  o != null && Object.hasOwnProperty.call(o, "jsonValue");
 
 export class SqlStatementVisitor extends SqlParserVisitor {
   private readonly output: SqlStatement[];
@@ -323,6 +326,14 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     } else if (ctx.func) {
       const funcCall = this.visitFunctionCall(ctx.func);
       Object.assign(col, funcCall);
+    } else if (ctx.json) {
+      const jsonData = this.visitJsonData(ctx.json);
+      Object.assign(col, jsonData);
+    } else {
+      throw this.errorWithContext(
+        new Error(`Invalid select element: ${ctx.text}`),
+        ctx
+      );
     }
 
     if (ctx.alias) {
@@ -867,5 +878,135 @@ export class SqlStatementVisitor extends SqlParserVisitor {
     };
 
     return val;
+  }
+
+  /**
+   ******************************* JSON Support *******************************
+   * */
+
+  // Visit a parse tree produced by SqlParser#jsonData.
+  override visitJsonData(ctx: ParserRuleContext) {
+    const [{ jsonValue }] = this.visitChildren(ctx);
+    if (Array.isArray(jsonValue)) {
+      const val: SqlValue = {
+        type: "array",
+        value: "[...]",
+        valueArray: jsonValue,
+      };
+      return val;
+    }
+    if (typeof jsonValue === "object") {
+      const val: SqlValue = {
+        type: "object",
+        value: "{...}",
+        valueObject: jsonValue,
+      };
+      return val;
+    }
+    throw this.errorWithContext(
+      new Error(`Invalid JSON data value: ${typeof jsonValue}`),
+      ctx
+    );
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonObject.
+  override visitJsonObject(ctx: ParserRuleContext) {
+    const jsonValue = Object.assign(
+      {},
+      ...this.visitChildren(ctx)
+        .filter(isJsonValue)
+        .map((o: any) => o.jsonValue)
+    );
+    return { jsonValue };
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonField.
+  override visitJsonField(ctx: ParserRuleContext) {
+    if (!ctx.key || !ctx.value) {
+      throw this.errorWithContext(
+        new Error(`Invalid JSON field: ${ctx.getText()}`),
+        ctx
+      );
+    }
+    const field = this.visitJsonId(ctx.key);
+    const value = this.visitJsonValue(ctx.value);
+    return { jsonValue: { [field]: value.jsonValue } };
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonId.
+  override visitJsonId(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    if (value?.type) {
+      return value.value;
+    }
+    return ctx.getText();
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonArray.
+  override visitJsonArray(ctx: ParserRuleContext) {
+    const value = this.visitChildren(ctx).filter(isJsonValue);
+
+    if (Array.isArray(value) && value.length > 0) {
+      const lastItem = value[value.length - 1];
+      if (lastItem.empty) {
+        value.pop();
+      }
+    }
+
+    const jsonValue = value.map((o: any) => o.jsonValue);
+    return { jsonValue };
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonArrayItem.
+  override visitJsonArrayItem(ctx: ParserRuleContext) {
+    const children = this.visitChildren(ctx);
+    const item = isJsonValue(children?.[0])
+      ? children[0]
+      : { jsonValue: undefined, empty: children === null };
+    return item;
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonValue.
+  override visitJsonValue(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    if (value.type) {
+      const val = new SqlFieldValue(value).value;
+      return { jsonValue: val };
+    }
+    return value;
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonString.
+  override visitJsonString(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    if (value.type) {
+      return value;
+    }
+    if (typeof value === "string") {
+      const val: SqlValue = {
+        type: "string",
+        value: value as string,
+      };
+      return val;
+    }
+    throw this.errorWithContext(
+      new Error(`Invalid JSON string value: ${typeof value}`),
+      ctx
+    );
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonPrimitive.
+  override visitJsonPrimitive(ctx: ParserRuleContext) {
+    const [value] = this.visitChildren(ctx);
+    return value;
+  }
+
+  // Visit a parse tree produced by SqlParser#jsonUndefined.
+  override visitJsonUndefined(ctx: ParserRuleContext) {
+    const value: SqlValue = {
+      type: "default",
+      value: ctx.getText(),
+    };
+    return value;
   }
 }

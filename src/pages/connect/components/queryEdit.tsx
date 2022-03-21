@@ -10,6 +10,7 @@ import Editor from "@monaco-editor/react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { CardMessage } from "../../../components/cardMessage";
 import { ParserError } from "../../../services/sqlParser";
+import { useMonacoSqlj } from "../../../hooks/useMonacoSqlj";
 
 export interface QueryEditProps {
   value: string | undefined;
@@ -17,15 +18,21 @@ export interface QueryEditProps {
   onChange: (query: string | undefined) => void;
 }
 export function QueryEdit({ value, errors, onChange }: QueryEditProps) {
+  const isReady = useMonacoSqlj();
+  if (!isReady) {
+    return null;
+  }
+
   return (
     <div className="flex-grow flex flex-col">
       <div className="flex flex-col flex-grow relative overflow-clip">
         <Editor
           className="absolute top-0 left-0 right-0 bottom-0 border"
-          defaultLanguage="sql"
+          language="sqlj"
           defaultValue="/* Enter your sql query here */"
           options={{
             minimap: { enabled: false },
+            "semanticHighlighting.enabled": true,
           }}
           value={value}
           onChange={onChange}

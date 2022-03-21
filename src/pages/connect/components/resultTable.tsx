@@ -45,7 +45,9 @@ export function ResultTable({ results }: { results: SqlStatementResult }) {
           return true;
         }
         result[colIx].canExpand =
-          typeof datum === "object" && !(datum instanceof Date);
+          result[colIx].type === "column" &&
+          typeof datum === "object" &&
+          !(datum instanceof Date);
         return false;
       });
     }

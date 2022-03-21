@@ -44,13 +44,13 @@ export function useSqlDeleteExecutor() {
         recordsFetched: 0,
       };
 
-      const fsQuery = new FirestoreQueryPlan(fs, table[0].name);
+      const fsQuery = new FirestoreQueryPlan(fs);
       const found = await fsQuery.execute(statement);
 
       result.rows = await promiseParallel(
         found,
         async (doc, rowIndex) => {
-          const data = doc.data();
+          const { data } = doc;
 
           try {
             await deleteDoc(doc.ref);

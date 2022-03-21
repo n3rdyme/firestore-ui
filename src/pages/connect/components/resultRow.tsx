@@ -30,10 +30,6 @@ export function ResultRow({ showDetail, row, column }: ResultRowProps) {
   let width = "w-8";
   let expand = false;
 
-  if (value?.toDate) {
-    value = value.toDate();
-  }
-
   if (value instanceof Date || patterns.isoDateTime.test(value)) {
     title = new Date(value).toISOString();
     value = new Date(value).toLocaleString();
@@ -65,14 +61,14 @@ export function ResultRow({ showDetail, row, column }: ResultRowProps) {
     <td className={width}>
       <div
         title={title ?? value}
-        className={classNames("flex  px-3 truncate", align, color)}
+        className={classNames("flex relative px-3 truncate", align, color)}
       >
         {value}
         {expand && (
           <button
             type="button"
             onClick={onOpen}
-            className="text-xs text-gray-400 hover:text-secondary p-0 m-0 px-1 -mr-2 ml-auto"
+            className="text-xs bg-white text-gray-400 hover:text-secondary p-0 m-0 px-1 absolute right-0 top-0 bottom-0"
           >
             &#x2026;
           </button>

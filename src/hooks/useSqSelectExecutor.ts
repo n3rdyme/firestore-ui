@@ -26,10 +26,10 @@ export function useSqlSelectExecutor() {
         throw new Error("Expected select statement");
       }
 
-      const { table, columns } = statement;
-      if (!table?.[0].name || !columns?.length) {
+      const { columns } = statement;
+      if (!columns?.length) {
         console.error("Invalid statement", statement);
-        throw new Error("Expected select with table and columns.");
+        throw new Error("Expected select with columns.");
       }
 
       const result: SqlStatementResult = {
@@ -41,12 +41,12 @@ export function useSqlSelectExecutor() {
         recordsFetched: 0,
       };
 
-      const fsQuery = new FirestoreQueryPlan(fs, table[0].name);
+      const fsQuery = new FirestoreQueryPlan(fs);
       const found = await fsQuery.execute(statement);
 
       result.rows = found.map((doc) => ({
         $id: doc.id,
-        ...doc.data(),
+        ...doc.data,
       }));
 
       result.recordsAffected = result.rows.length;

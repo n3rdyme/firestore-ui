@@ -16,13 +16,12 @@ import {
   orderBy,
   where,
   getDocs,
-  DocumentData,
-  CollectionReference,
-  QueryDocumentSnapshot,
+  DocumentReference,
 } from "firebase/firestore";
 import { sqlComparisonTable } from "../services/sqlComparisons";
 import { SqlFieldValue } from "../services/sqlFieldValue";
 import {
+  DOTTED_ID_SPLIT,
   SqlColumn,
   SqlNormalExpression,
   SqlNormalizedAnd,
@@ -30,7 +29,14 @@ import {
   SqlPredicate,
   SqlStatement,
 } from "../services/sqlStatement";
+import { convertTimestampToDates } from "./convertTimestampToDates";
 import { promiseParallel } from "./promiseParallel";
+
+export interface DataWithId {
+  id: string;
+  ref: DocumentReference<unknown>;
+  data: { [key: string]: any };
+}
 
 // Just used to ensure that this class doesn't care about the type of the
 // statement, or if the statement has columns or not.
@@ -40,13 +46,9 @@ type SqlStatementQuery = Pick<
 >;
 
 export class FirestoreQueryPlan {
-  private collection: CollectionReference<DocumentData>;
-
   private totalRecords = 0;
 
-  constructor(private readonly fs: Firestore, readonly collectionName: string) {
-    this.collection = collection(this.fs, collectionName);
-  }
+  constructor(private readonly fs: Firestore) {}
 
   public get recordsScanned() {
     return this.totalRecords;
@@ -73,8 +75,8 @@ export class FirestoreQueryPlan {
 
   private filterResults(
     statement: SqlStatementQuery,
-    dataset: QueryDocumentSnapshot<DocumentData>[]
-  ): QueryDocumentSnapshot<DocumentData>[] {
+    dataset: DataWithId[]
+  ): DataWithId[] {
     const { query: criteria } = statement;
 
     if (!criteria || criteria.or.length === 0) {
@@ -87,7 +89,7 @@ export class FirestoreQueryPlan {
         console.warn("Operator not implemented.", exp);
         return false;
       }
-      const data = { $id: doc.id, ...doc.data() };
+      const data = { $id: doc.id, ...doc.data };
       const rhs = !exp.right
         ? undefined
         : new SqlFieldValue(exp.right).getValue(data);
@@ -112,16 +114,16 @@ export class FirestoreQueryPlan {
 
   private orderedResults(
     statement: SqlStatementQuery,
-    dataset: QueryDocumentSnapshot<DocumentData>[]
-  ): QueryDocumentSnapshot<DocumentData>[] {
+    dataset: DataWithId[]
+  ): DataWithId[] {
     const { orderBy: orderByFields } = statement;
     if (!orderByFields?.length) {
       return dataset;
     }
 
     return dataset.sort((a, b) => {
-      const docA = { $id: a.id, ...a.data() };
-      const docB = { $id: b.id, ...b.data() };
+      const docA = { $id: a.id, ...a.data };
+      const docB = { $id: b.id, ...b.data };
 
       for (const { name, order } of orderByFields) {
         const col: SqlColumn = { type: "column", value: name };
@@ -144,7 +146,7 @@ export class FirestoreQueryPlan {
 
   private async getDocuments(
     statement: SqlStatementQuery
-  ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
+  ): Promise<DataWithId[]> {
     // It's usually more efficient to use multiple queries if there are multiple equality conditions,
     // i.e. WHERE ( id = 1 or id = 2 )
     const plans = this.planMultipleQueries(statement);
@@ -175,7 +177,17 @@ export class FirestoreQueryPlan {
 
   private async getDocumentsFromQuery(
     statement: SqlStatementQuery
-  ): Promise<QueryDocumentSnapshot<DocumentData>[]> {
+  ): Promise<DataWithId[]> {
+    if (!statement.table?.[0]?.name) {
+      return [
+        {
+          id: null as any,
+          ref: null as any,
+          data: {},
+        },
+      ];
+    }
+
     // single query execution
     const constraints = [
       ...this.getQuery(statement),
@@ -183,12 +195,17 @@ export class FirestoreQueryPlan {
       ...this.getLimits(statement),
     ];
 
-    const q = query(this.collection, ...constraints);
+    const coll = collection(this.fs, statement.table?.[0]?.name ?? "ignore");
+    const q = query(coll, ...constraints);
     const documents = await getDocs(q);
 
     this.totalRecords += documents.size;
     const results = documents.docs;
-    return results;
+    return results.map((doc) => ({
+      id: doc.id,
+      ref: doc.ref,
+      data: convertTimestampToDates(doc.data()),
+    }));
   }
 
   private planMultipleQueries(
@@ -335,9 +352,15 @@ export class FirestoreQueryPlan {
       const result = criteria.common.filter(
         (c) =>
           c.left?.type === "column" &&
+          // Firestore does not support equality on all nested types
+          !DOTTED_ID_SPLIT.test(c.left?.value) &&
+          // Firestore does not support equality on the following cases
           c.right?.type !== "default" &&
           c.right?.type !== "null" &&
-          c.right?.type !== "column"
+          c.right?.type !== "column" &&
+          c.right?.type !== "function" &&
+          c.right?.type !== "object" &&
+          c.right?.type !== "array"
       );
       return result;
     }
